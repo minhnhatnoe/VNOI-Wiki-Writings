@@ -32,7 +32,9 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
 Ví dụ, xét số ```5 = 0b101```, nếu thực hiện phép toán ```0b101<<2```, ta nhận được ```0b10100 = 20```.
 
-Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau của phép toán Bitshift Left: ```a << b``` $= a * 2^b$. Ta có tính chất này do phép toán Bitshift Left có thể hiểu là thêm một số 0 
+Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau của phép toán Bitshift Left: ```a << b``` $= a * 2^b$. Ta có tính chất này do phép toán Bitshift Left ```a<<b``` có thể hiểu là thêm ```b``` chữ số 0 vào cuối biểu diễn nhị phân của số ```a```. Điều này tương tự như việc thêm một chữ số 0 vào cuối biểu diễn thập phân của một số sẽ nhân số đó thêm 10 lần.
+
+
 
 ### Logical Shift, Arithmetic Shift
 
