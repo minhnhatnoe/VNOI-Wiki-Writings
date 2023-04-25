@@ -56,9 +56,24 @@ Trong phép toán ```a << b```, nếu giá trị của ```b``` lớn hơn hoặc
 
 ### Toán tử BITSHIFT RIGHT (>>)
 
-Nếu như Left Shift là thêm chữ số $0$ vào bên phải của một số nguyên ở dạng nhị phân, ta có thể hiểu Right Shift là xóa các chữ số ở bên phải. 
+Nếu như Left Shift là thêm chữ số $0$ vào bên phải của một số nguyên ở dạng nhị phân, ta có thể hiểu Right Shift là xóa các chữ số ở bên phải.
+
+Ví dụ, xét số ```13 = 0b1101```, ta có ```0b1101 >> 2 = 0b11```.
+
+Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$ với $a$ nguyên không âm
 
 #### Phân biệt Logical Right Shift và Arithmetic Right Shift
+
+Riêng đối với Right Shift, hầu hết các cấu trúc máy tính cung cấp hai loại phép toán khác nhau.
+
+Khác biệt duy nhất giữa Logical Right Shift và Arithmetic Right Shift là Logical Right Shift điền các bit bên trái mới được thêm đều là $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu.
+
+Chẳng hạn, ta sử dụng kiểu số ```char``` có 8 bit, và thực hiện phép toán ```0b10101101 >> 5```. Logical Right Shift sẽ trả về kết quả ```0b00000101```, nhưng Arithmetic Right Shift sẽ trả về ```0b11111101```.
+
+Dù Lý do Arithmetic Right Shift
+
+[//]: <> (TODO: Recheck definition of both types)
+
 
 Việc sử dụng các toán tử thao tác Bit có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng Bit của các toán hạng (operands).
 
