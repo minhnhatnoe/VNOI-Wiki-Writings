@@ -49,7 +49,7 @@ Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau 
 
 #### Chú ý với C++
 
-Trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trương hợp xảy ra:
+Trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
 1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất.
 2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó.
 
@@ -67,7 +67,7 @@ Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfl
 
 Riêng đối với Right Shift, hầu hết các cấu trúc máy tính cung cấp hai loại phép toán khác nhau.
 
-Khác biệt duy nhất giữa Logical Right Shift và Arithmetic Right Shift là Logical Right Shift điền các bit bên trái mới được thêm đều là $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu (bit thứ $31$ đối với kiểu ```int```, và bit thứ $63$ đối với kiểu ```long long```).
+Khác biệt duy nhất giữa Logical Right Shift và Arithmetic Right Shift là Logical Right Shift điền các bit bên trái mới được thêm bằng $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu (bit thứ $31$ đối với kiểu ```int```, và bit thứ $63$ đối với kiểu ```long long```).
 
 Chẳng hạn, ta sử dụng kiểu số ```char``` có 8 bit, và thực hiện phép toán ```0b```**```101```**```01101 >> 5```. Logical Right Shift sẽ trả về kết quả ```0b00000```**```101```**, nhưng Arithmetic Right Shift sẽ trả về ```0b11111```**```101```**.
 
@@ -75,7 +75,7 @@ Chắc chắn khi đọc đến đây, các bạn sẽ tự hỏi về ý nghĩa
 
 Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn bằng dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
 
-Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì máy sẽ sử dụng Arithmetic Right Shift.
+Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì phép ```>>``` sẽ là Arithmetic Right Shift.
 
 ### Toán tử Bitwise AND (&), OR (|) và XOR (^)
 
@@ -146,6 +146,23 @@ Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép
 
 Ngoài ra cũng có một số các cách khác để truy cập bit, ví dụ như ```(A >> i) % 2```, hay ```(A >> i) & 1```.
 
+Chú ý: Một lỗi rất hay gặp phải khi sử dụng bitshift để truy cập và chỉnh sửa bit là tràn số. Chẳng hạn, xét dòng code sau đây:
+
+```c++
+bool get_bit(unsigned long long a, int pos){
+    return a & (1<<pos)
+}
+```
+Trong trường hợp $pos \geq 32$, biểu thức ```1<<pos``` sẽ bị tràn số do cả ```1``` và ```pos``` đều có kiểu ```int```. Để tránh bị tràn số, ta đổi đoạn code trên thành như sau:
+
+```c++
+bool get_bit(long long a, int pos){
+    return a & (1ULL << pos);
+}
+```
+
+Hậu tố ```ULL``` đánh dấu cho compiler biết rằng ```1ULL``` cần được coi là một số ```unsigned long long```. Như vậy, phép ```1ULL << pos``` sẽ không còn bị tràn số. Một số các hậu tố thường dùng bao gồm: ```ULL``` cho ```unsigned long long```, ```LL``` cho ```long long```, ```L``` cho ```long```, ...
+
 #### Chỉnh sửa Bit
 
 Sử dụng phương pháp tương tự như phần trên, ta có một số phép sửa Bit như sau:
@@ -162,14 +179,16 @@ Sử dụng phương pháp tương tự như phần trên, ta có một số ph�
 
 Như đã nói ở phần đầu bài viết, ứng dụng đơn giản nhất của bitmask là biểu diễn một tập con của một tập $A$ cho trước nào đó. Từ ứng dụng này, ta có một dạng bài tên là quy hoạch động trạng thái (dp bitmask).
 
-Khi đó, các phép toán AND, OR, XOR, NOT lần lượt tương ứng với các phép lấy giao, lấy hợp, lấy hiệu đối xứng, và lấy phần bù của tập hợp.
+Một số các phép toán tập hợp có thể thực hiện bằng các phép toán trên bitmask, ví dụ như:
 
-Các phép toán tập hợp khác cũng có thể được biểu diễn bằng bitmask, ví dụ như:
-
-1. Kiểm tra $A$ là tập con của $B$ bằng ```A & B == A```.
-2. Tạo tập hợp $A$ chỉ có phần tử thứ $i$ bằng ```1 << i```.
-3. Hiệu của hai tập hợp $A$ và $B$ bằng ```(A ^ B) & A```.
-4. Phần bù của tập hợp $B$ trong $A$ băng ```A & ~B```.
+1. Lấy giao của tập $A$ và tập $B$ với ```A & B```.
+2. Lấy hợp của của tập $A$ và $B$ với ```A | B```.
+3. Lấy hiệu đối xứng của tập $A$ và $B$ với ```A ^ B```.
+4. Lấy phần bù của tập $A$ với ```~A```.
+5. Kiểm tra $A$ là tập con của $B$ bằng ```A & B == A```.
+6. Tạo tập hợp $A$ chỉ có phần tử thứ $i$ bằng ```1 << i```.
+7. Hiệu của hai tập hợp $A$ và $B$ bằng ```(A ^ B) & A```.
+8. Phần bù của tập hợp $B$ trong $A$ băng ```A & ~B```.
 
 #### Lặp qua mọi tập con
 
