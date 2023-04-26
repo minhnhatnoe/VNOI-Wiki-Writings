@@ -11,16 +11,16 @@ Các phép toán với bit (Bitwise Operators) là một tập hợp các toán 
 Một số đoạn code trong bài viết chỉ đảm bảo hoạt động với compiler GCC. Các đoạn này sẽ được viết kèm theo mục Chú ý ở phía dưới.
 
 Các khái niệm sau được sử dụng xuyên suốt bài viết:
-- **Bảng chân lý (Truth Table)** của một toán tử Bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó. Ví dụ, phép toán AND trong C++ giữa hai giá trị bool có thể được biểu diễn như sau
+- **Bảng chân lý (Truth Table)** của một toán tử Bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó. Sau đây là bảng chân lý của một số các toán tử sẽ được giới thiệu trong bài viết này
 
 <center>
 
-|a|b|AND|
-|---|---|---|
-|1|1|1|
-|1|0|0|
-|0|1|0|
-|0|0|0|
+|a|b|AND|OR|XOR|
+|:-|:-|:-|:-|:-|
+|1|1|1|1|0|
+|1|0|0|1|1|
+|0|1|0|1|1|
+|0|0|0|0|0|
 
 </center>
 
@@ -74,31 +74,32 @@ Chắc chắn khi đọc đến đây, các bạn sẽ tự hỏi về ý nghĩa
 
 Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn bằng dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
 
-Việc sử dụng các toán tử thao tác Bit có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng Bit của các toán hạng (operands).
+Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì máy sẽ sử dụng Arithmetic Right Shift.
 
-### Toán tử Bitwise AND (&)
+### Toán tử Bitwise AND (&), OR (|) và XOR (^)
 
-Phép toán AND trả về True khi và chỉ khỉ cả hai toán hạng là True. Chẳng hạn, 
+Việc sử dụng ba toán tử này có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng Bit của các toán hạng (operands). Nói cách khác, nếu ký hiệu $a_i$ là bit thứ $i$ của bitmask $a$, việc thực hiện phép toán $c = a \oplus b$ trong đó $a, b, c$ là các bitmask và $\oplus$ là một phép toán nào đó sẽ tương đương với việc thực hiện $c_i = a_i \oplus b_i \forall 0 \leq i$.
 
-### Toán tử Bitwise OR
+Định nghĩa của các phép toán này như sau:
 
-Phép toán OR có bảng chân 
+1. **AND** trả về True khi và chỉ khi cả hai toán hạng là True.
 
-### Toán tử Bitwise XOR
+    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b10100010```
+2. **OR** trả về True khi và chỉ khi ít nhất một toán hạng là True.
 
-### Toán tử Bitwise NOT
+    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b11101111```.
+3. **XOR** trả về True khi và chỉ khi hai toán hạng có giá trị khác nhau. Một cách hiểu khác cho **XOR** là phép cộng theo modulo 2.
 
-### Ứng dụng
+    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b01001101```.
 
-#### Sửa và truy cập bit
 
-Một ứng dụng thường thấy của các phép toán Bitshift là đọc và sửa từng bit trong một Bitmask.
+### Toán tử Bitwise NOT (~)
 
-Chẳng hạn, để truy cập bit thứ $i$ trong bitmask $A$, ta có thể sử dụng phép toán ```(A >> i) % 2```. Trước khi đọc giải thích của phép toán này, hãy dành ra một chút thời gian để tự mình chạy thử một số ví dụ.
+Toán tử Bitwise NOT có lẽ là toán tử đơn giản nhất. Toán tử này nhận vào một toán hạng $A$ trả về phần bù của toán hạng này. Nói cách khác, định nghĩa của NOT là trả về False khi và chỉ khi toán hạng là True.
 
-Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép toán ```(0b1010010 >> 4) % 2 = 0b101 % 2 = 1```. Xét phần đầu tiên của phép toán, ```A >> i```, ta nhận thấy rằng, về bản chất, phần này thực hiện thao tác đưa bit thứ $i$ về vị trí $0$. Để truy cập bit thứ $0$ này, ta lấy số dư khi chia cho $2$ của số này.
+Ví dụ, ta có ```~0b10100100 = 0b01011011``` (trong trường hợp đầu vào là kiểu số có 8 bit).
 
-Một số cách truy cập khác của 
+Cần chú ý, do máy tính chỉ quan tâm tới số lượng bit của kiểu số đầu vào, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (có 8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
 
 ## Các hàm thao tác Bit
 [//]: <> (TODO: C++20 functions)
@@ -109,3 +110,56 @@ Một số cách truy cập khác của
 ### Hàm CTZ, FFS
 
 ## Sử dụng toán tử Bit để tăng tốc cho code
+
+### Ứng dụng
+
+#### Truy cập Bit
+
+Một ứng dụng thường thấy của các phép toán Bit là đọc và sửa từng bit trong một bitmask.
+
+Chẳng hạn, để truy cập bit thứ $i$ trong bitmask $A$, ta có thể sử dụng phép toán ```A & (1<<i)```. Trước khi đọc giải thích của phép toán này, hãy dành ra một chút thời gian để tự mình chạy thử một số ví dụ.
+
+Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép toán ```0b1010010 & (1<<4) = 0b1010010 & 0b10000 = 0b10000```. Xét phần thứ hai của phép toán, ```1<<i```, ta nhận thấy rằng, về bản chất, phần này thực hiện thao tác tạo ra một bitmask chỉ có bit thứ $i$ bật. Bitmask này khi được AND với bitmask ban đầu sẽ loại bỏ thông tin của tất cả mọi bit ngoại trừ bit thứ $i$.
+
+Ngoài ra cũng có một số các cách khác để truy cập bit, ví dụ như ```(A >> i) % 2```, hay ```(A >> i) & 1```.
+
+#### Chỉnh sửa Bit
+
+Sử dụng phương pháp tương tự như phần trên, ta có một số phép sửa Bit như sau:
+
+1. Gán một Bit bằng $0$ với ```A & ~(1<<i)```.
+2. Gán một Bit bằng $1$ với ```A | (1<<i)```.
+3. Flip một Bit (từ $0$ sang $1$ hoặc từ $1$ sang $0$) với ```A ^ (1<<i)```.
+
+#### Tắt các Bit cao nhất của một bitmask
+
+Để lấy các bit trong khoảng từ $0$ tới $i-1$ của một bitmask, hay đồng loạt tắt tất cả các bit từ $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Phép toán ```((1<<i) - 1)``` tạo ra bitmask mà trong đó chỉ các bit từ $0$ tới $i-1$ được bật lên.
+
+#### Biểu diễn tập hợp
+
+Như đã nói ở phần đầu bài viết, ứng dụng đơn giản nhất của bitmask là biểu diễn một tập con của một tập $A$ cho trước nào đó. Từ ứng dụng này, ta có một dạng bài tên là quy hoạch động trạng thái (dp bitmask).
+
+Khi đó, các phép toán AND, OR, XOR, NOT lần lượt tương ứng với các phép lấy giao, lấy hợp, lấy hiệu đối xứng, và lấy phần bù của tập hợp.
+
+Các phép toán tập hợp khác cũng có thể được biểu diễn bằng bitmask, ví dụ như:
+1. Kiểm tra $A$ là tập con của $B$ bằng ```A & B == A```.
+2. Tạo tập hợp $A$ chỉ có phần tử thứ $i$ bằng ```1 << i```.
+3. Hiệu của hai tập hợp $A$ và $B$ bằng ```(A ^ B) & A```.
+4. Phần bù của tập hợp $B$ trong $A$ băng ```A & ~B```.
+
+#### Lặp qua mọi tập con
+
+Để lặp qua mọi tập con của $S$, ta viết vòng lặp ```for``` như sau:
+
+```c++
+for (int i=S; true; i = (i-1) & S) {
+    // Thực hiện thao tác nào đó với tập con i của S
+    if (i == 0) break;
+}
+```
+Độ phức tạp của vòng lặp trên là $2^{|S|}$, chính là số tập con của $S$. Như vậy, nếu như ta lặp mọi tập $S$ từ $0$ tới $2^n$, sau đó lặp mọi tập con của $S$, độ phức tạp thời gian sẽ là $3^n$.
+
+#### Cài đặt cấu trúc dữ liệu Fenwick Tree
+
+Cách cài đặt [Fenwick Tree](https://vnoi.info/wiki/algo/data-structures/fenwick.md) tối ưu cũng là một trong những ứng dụng thú vị của các toán tử Bit.
+
