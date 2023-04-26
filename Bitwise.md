@@ -35,7 +35,7 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
     Trên thực tế, ta sẽ biểu diễn bitmask bằng các số nguyên (ví dụ như các kiểu ```int``` hay ```long long``` trong C++), hoặc các cấu trúc dữ liệu bit như ```bitset``` của C++.
 
-- Trong một bitmask, **bit thứ $i$ bật** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $1$. Tương tự, ***bit thứ $i$ tắt$ có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $0$.
+- Trong một bitmask, **bit thứ $i$ bật** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $1$. Tương tự, **bit thứ $i$ tắt** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $0$.
 
 ## Các toán tử thao tác Bit (Bitwise Operators) cơ bản
 
