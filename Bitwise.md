@@ -14,7 +14,7 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
 - **Bảng chân lý (Truth Table)** của một toán tử Bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó. Sau đây là bảng chân lý của một số các toán tử sẽ được giới thiệu trong bài viết này
 
-<center>
+<div align="center">
 
 |a|b|AND|OR|XOR|
 |:-|:-|:-|:-|:-|
@@ -23,7 +23,7 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 |0|1|0|1|1|
 |0|0|0|0|0|
 
-</center>
+</div>
 
 - **Biểu diễn dạng nhị phân của một số** được đánh dấu bằng tiền tố ```0b```. Chẳng hạn, với số ```12``` có biểu diễn nhị phân là ```1100```, ta viết ```12 = 0b1100```. Đây cũng là cách viết được chấp nhận trong code C++.
 
@@ -50,6 +50,7 @@ Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau 
 #### Chú ý với C++
 
 Trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
+
 1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất.
 2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó.
 
@@ -134,9 +135,9 @@ Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```
 
 Hàm tương đương của GCC là ```std:::__builtin_ctz(x)``` (count trailing zeroes). Tuy nhiên hàm này có giá trị không xác định với ```x == 0```. GCC cũng cung cấp một hàm khác là ```std::__builtin_ffs(x) == std::__builtin_ctz(x) + 1```. Trong trường hợp ```x == 0```, hàm này trả về $0$.
 
-### Ứng dụng
+## Ứng dụng
 
-#### Truy cập Bit
+### Truy cập Bit
 
 Một ứng dụng thường thấy của các phép toán Bit là đọc và sửa từng bit trong một bitmask.
 
@@ -153,6 +154,7 @@ bool get_bit(unsigned long long a, int pos){
     return a & (1<<pos)
 }
 ```
+
 Trong trường hợp $pos \geq 32$, biểu thức ```1<<pos``` sẽ bị tràn số do cả ```1``` và ```pos``` đều có kiểu ```int```. Để tránh bị tràn số, ta đổi đoạn code trên thành như sau:
 
 ```c++
@@ -163,7 +165,7 @@ bool get_bit(long long a, int pos){
 
 Hậu tố ```ULL``` đánh dấu cho compiler biết rằng ```1ULL``` cần được coi là một số ```unsigned long long```. Như vậy, phép ```1ULL << pos``` sẽ không còn bị tràn số. Một số các hậu tố thường dùng bao gồm: ```ULL``` cho ```unsigned long long```, ```LL``` cho ```long long```, ```L``` cho ```long```, ...
 
-#### Chỉnh sửa Bit
+### Chỉnh sửa Bit
 
 Sử dụng phương pháp tương tự như phần trên, ta có một số phép sửa Bit như sau:
 
@@ -171,11 +173,11 @@ Sử dụng phương pháp tương tự như phần trên, ta có một số ph�
 2. Gán một Bit bằng $1$ với ```A | (1<<i)```.
 3. Flip một Bit (từ $0$ sang $1$ hoặc từ $1$ sang $0$) với ```A ^ (1<<i)```.
 
-#### Tắt các Bit cao nhất của một bitmask
+### Tắt các Bit cao nhất của một bitmask
 
 Để lấy các bit trong khoảng từ $0$ tới $i-1$ của một bitmask, hay đồng loạt tắt tất cả các bit từ $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Phép toán ```((1<<i) - 1)``` tạo ra bitmask mà trong đó chỉ các bit từ $0$ tới $i-1$ được bật lên.
 
-#### Biểu diễn tập hợp
+### Biểu diễn tập hợp
 
 Như đã nói ở phần đầu bài viết, ứng dụng đơn giản nhất của bitmask là biểu diễn một tập con của một tập $A$ cho trước nào đó. Từ ứng dụng này, ta có một dạng bài tên là quy hoạch động trạng thái (dp bitmask).
 
@@ -190,23 +192,74 @@ Một số các phép toán tập hợp có thể thực hiện bằng các phé
 7. Hiệu của hai tập hợp $A$ và $B$ bằng ```(A ^ B) & A```.
 8. Phần bù của tập hợp $B$ trong $A$ băng ```A & ~B```.
 
-#### Lặp qua mọi tập con
+### Lặp qua mọi tập con của tập cho trước
+
+Để lặp qua mọi tập con $A$ của một tập $S$ cho trước, ta viết vòng ```for``` như sau:
+
+```c++
+void loop_subset(const vector<int> &s){
+    for (int i=0; i<(1<<s.size()); i++){
+        vector<int> a;
+        for (int j=0; j<s.size(); j++){
+            if (i & (1<<j))
+                s[i].push_back(s[j]);
+        }
+        // Thực hiện thao tác gì đó với tập con $A$
+    }
+}
+```
+
+### Lặp qua mọi tập con của một bitmask
 
 Để lặp qua mọi tập con của $S$, ta viết vòng lặp ```for``` như sau:
 
 ```c++
-for (int i=S; true; i = (i-1) & S) {
-    // Thực hiện thao tác nào đó với tập con i của S
-    if (i == 0) break;
+void loop_mask_subset(int S){
+    for (int i=S; true; i = (i-1) & S) {
+        // Thực hiện thao tác nào đó với tập con i của S
+        if (i == 0) break;
+    }
 }
 ```
 
 Độ phức tạp của vòng lặp trên là $2^{|S|}$, chính là số tập con của $S$. Như vậy, nếu như ta lặp mọi tập $S$ từ $0$ tới $2^n$, sau đó lặp mọi tập con của $S$, độ phức tạp thời gian sẽ là $3^n$.
 
-#### Cài đặt cấu trúc dữ liệu Fenwick Tree
+### Cài đặt cấu trúc dữ liệu Fenwick Tree
 
 Cách cài đặt [Fenwick Tree](https://vnoi.info/wiki/algo/data-structures/fenwick.md) tối ưu cũng là một trong những ứng dụng thú vị của các toán tử Bit.
 
-#### Giải các bài toán bao hàm loại trừ
+### Giải các bài toán bao hàm loại trừ
 
-#### Tăng tốc cho code
+#### Đề bài
+
+Cho một tập $S$ gồm các số nguyên tố phân biệt. Gọi $a$ là tích các số trong tập $S$. Trong các số thuộc khoảng $[0, n]$, đếm số số nguyên tố cùng nhau với $a$.
+
+#### Thuật toán
+
+Ta lặp qua mọi tập con $T$ của $S$. Gọi $b$ là tích các số trong tập $T$, và $x$ là số số trong khoảng $[0, n]$ chia hết cho $b$. Nếu $T$ có chẵn phần tử, ta cộng $x$ vào đáp án. Ngược lại, ta trừ $x$ vào đáp án.
+
+Phần chứng minh cho bài toán này bạn đọc có thể tham khảo ở bài viết về [bao hàm loại trừ](https://vnoi.info/wiki/translate/he/Number-Theory-7.md).
+
+#### Cài đặt
+
+```c++
+unsigned long long solve(const vector<unsigned long long> &a, unsigned long long n){
+    unsigned long long result = 0;
+    for (int i = 0; i < (1<<a.size()); i++){
+        unsigned long long b = 1;
+        for (int j=0; j<a.size(); j++){
+            if (i & (1<<j)) b *= a[j];
+        }
+        unsigned long long x = result / b + 1;
+        if (__builtin_parity(i)) result -= x;
+        else result += x;
+    }
+    return result;
+}
+```
+
+Chú ý: Đoạn code này chỉ mang tính chất minh họa, do trên thực tế kết quả có thể tràn ```unsigned long long```. Tuy nhiên, kết quả của các thao tác tính toán tràn số trên các kiểu ```unsigned``` được xác định, nên nếu tích các số trong tập $A$ không tràn số, code này sẽ trả về kết quả theo mod $2^{64}$.
+
+### Tăng tốc cho code
+
+Nếu sử dụng kiểu dữ liệu ```unsigned long long```, ta có thể thực hiện 64 phép AND, OR, XOR, hoặc NOT trong một thao tác. Trên thực tế, khi dịch, một số các compiler có thể giúp bạn thực hiện $256$ hay thậm chí $512$ phép toán như vậy cùng một lúc. Như vậy, một số bài toán với giới hạn như $n \leq 5*10^4$ hay thậm chí $n \leq 10^5$ có thể chạy được với độ phức tạp $O(n^2)$. Tuy nhiên, do giới hạn của bài viết, chủ đề này sẽ không được bàn đến ở đây.
