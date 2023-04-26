@@ -48,11 +48,11 @@ Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau 
 
 #### Chú ý với C++
 
-Trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), các bit bị tràn sẽ được coi như là $0$, và biến mất.
+Trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trương hợp xảy ra:
+1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất.
+2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó.
 
-[//]: <> (TODO: Determine whether overflow is UB)
-
-Trong phép toán ```a << b```, nếu giá trị của ```b``` lớn hơn hoặc bằng số lượng bit mà kiểu số của kết quả hỗ trợ ($64$ đối với ```(unsigned) long long``` và $32$ đối với ```(unsigned) int```), kết quả trả về của phép toán là không xác định.
+Trong phép toán ```a << b```, nếu giá trị của ```b``` là âm hoặc lớn hơn hoặc bằng số lượng bit mà kiểu số của kết quả hỗ trợ ($64$ đối với ```(unsigned) long long``` và $32$ đối với ```(unsigned) int```), kết quả trả về của phép toán là không xác định.
 
 ### Toán tử BITSHIFT RIGHT (>>)
 
@@ -66,14 +66,13 @@ Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfl
 
 Riêng đối với Right Shift, hầu hết các cấu trúc máy tính cung cấp hai loại phép toán khác nhau.
 
-Khác biệt duy nhất giữa Logical Right Shift và Arithmetic Right Shift là Logical Right Shift điền các bit bên trái mới được thêm đều là $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu.
+Khác biệt duy nhất giữa Logical Right Shift và Arithmetic Right Shift là Logical Right Shift điền các bit bên trái mới được thêm đều là $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu (bit thứ $31$ đối với kiểu ```int```, và bit thứ $63$ đối với kiểu ```long long```).
 
-Chẳng hạn, ta sử dụng kiểu số ```char``` có 8 bit, và thực hiện phép toán ```0b10101101 >> 5```. Logical Right Shift sẽ trả về kết quả ```0b00000101```, nhưng Arithmetic Right Shift sẽ trả về ```0b11111101```.
+Chẳng hạn, ta sử dụng kiểu số ```char``` có 8 bit, và thực hiện phép toán ```0b```**```101```**```01101 >> 5```. Logical Right Shift sẽ trả về kết quả ```0b00000```**```101```**, nhưng Arithmetic Right Shift sẽ trả về ```0b11111```**```101```**.
 
-Dù Lý do Arithmetic Right Shift
+Chắc chắn khi đọc đến đây, các bạn sẽ tự hỏi về ý nghĩa của phép Arithmetic Right Shift. Trong trường hợp toán hạng ```a``` là số không âm, hai phép toán hoạt động tương đương. Tuy nhiên, trong trường hợp ```a``` âm, phép Logical Right Shift không có ý nghĩa về mặt toán học, mà đơn giản chỉ là đẩy các bit sang phải. Trong khi đó, phép Arithmetic Right Shift sẽ vẫn đảm bảo tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$. Chú ý rằng kết quả của phép toán sẽ được làm tròn xuống, chẳng hạn như ```-7 >> 2``` $= \frac{-7}{2^2} = -1.75$ được làm tròn xuống $-2$.
 
-[//]: <> (TODO: Recheck definition of both types)
-
+Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn bằng dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
 
 Việc sử dụng các toán tử thao tác Bit có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng Bit của các toán hạng (operands).
 
