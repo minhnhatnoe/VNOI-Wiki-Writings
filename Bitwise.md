@@ -122,13 +122,17 @@ Ngoài ra, GCC cũng cung cấp hàm ```std::__builtin_parity(x)``` trả về `
 
 Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::countl_zero(x)``` trả về số lượng bit $0$ ở bên trái của biến đầu vào.
 
-Chẳng hạn, ```countl_zero(int(0b10)) == 30``` (do kiểu ```int``` có 32 bit).
+Chẳng hạn, ```std::countl_zero(int(0b10)) == 30``` (do kiểu ```int``` có 32 bit).
 
-GCC cũng có hàm ```__builtin_clz(x)```. Tuy nhiên, hàm này trả về kết quả không xác định đói với ```x == 0```.
+GCC cũng có hàm ```std::__builtin_clz(x)``` (count leading zeroes). Tuy nhiên, hàm này trả về kết quả không xác định đối với ```x == 0```.
 
-### Hàm CTZ, FFS
+Phép toán ```31 - std::__builtin_clz(x)``` hay ```63 - std::__builtin_clzll(x)``` trả về $\lfloor \log_2(x) \rfloor$, thường được sử dụng trong cài đặt của Bảng thưa (Sparse Table) hoặc FFT.
 
-## Sử dụng toán tử Bit để tăng tốc cho code
+### Hàm COUNTR_ZERO
+
+Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::countr_zero(x)``` trả về số lượng bit $0$ ở bên phải của biến đầu vào.
+
+Hàm tương đương của GCC là ```std:::__builtin_ctz(x)``` (count trailing zeroes). Tuy nhiên hàm này có giá trị không xác định với ```x == 0```. GCC cũng cung cấp một hàm khác là ```std::__builtin_ffs(x) == std::__builtin_ctz(x) + 1```. Trong trường hợp ```x == 0```, hàm này trả về $0$.
 
 ### Ứng dụng
 
@@ -185,3 +189,5 @@ for (int i=S; true; i = (i-1) & S) {
 Cách cài đặt [Fenwick Tree](https://vnoi.info/wiki/algo/data-structures/fenwick.md) tối ưu cũng là một trong những ứng dụng thú vị của các toán tử Bit.
 
 #### Giải các bài toán bao hàm loại trừ
+
+#### Tăng tốc cho code
