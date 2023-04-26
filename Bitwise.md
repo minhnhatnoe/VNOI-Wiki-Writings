@@ -4,7 +4,7 @@ Người viết: Nguyễn Minh Nhật - HUS High School for Gifted Students
 
 ## Giới thiệu
 
-Các phép toán với bit (Bitwise Operators) là một tập hợp các toán tử và hàm dành riêng cho việc thực hiện các thao tác biến đổi và tính toán trên các bit của một số nguyên.
+Các phép toán với bit (Bitwise Operators) là một tập hợp các toán tử và hàm dành riêng cho việc thực hiện các thao tác biến đổi và tính toán trên các bit của một số nguyên (ví dụ như ```int``` hay ```long long``` trong C++).
 
 ## Lưu ý trước khi đọc bài viết
 
@@ -12,7 +12,7 @@ Một số đoạn code trong bài viết chỉ đảm bảo hoạt động vớ
 
 Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
-- **Bảng chân lý (Truth Table)** của một toán tử Bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó. Sau đây là bảng chân lý của một số các toán tử sẽ được giới thiệu trong bài viết này
+- **Bảng chân lý (Truth Table)** của một toán tử bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó. Sau đây là bảng chân lý của một số các toán tử sẽ được giới thiệu trong bài viết này
 
 <div align="center">
 
@@ -31,13 +31,13 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
     Ví dụ đơn giản nhất của bitmask là biểu diễn một tập con của một tập hợp $A$ cho trước. Chẳng hạn, $A = \{5, 1, 2, 3, 0, 4\}$, bitmask ```0b110010``` biểu diễn cho tập con $\{1, 0, 4\}$ của $A$.
 
-    Chú ý rằng, trong bài viết này, thứ tự các bit của bitmask được đánh số từ phải sang trái, bắt đầu từ $0$. Điều này tương tự như chữ số hàng đơn vị, hàng chục, hàng trăm, hàng nghìn trong số thập phân lần lượt được viết từ trái sang phải, từ thấp đến cao.
+    Chú ý: Trong bài viết này, thứ tự các bit của bitmask được đánh số từ phải sang trái, bắt đầu từ $0$. Điều này tương tự như chữ số hàng đơn vị, hàng chục, hàng trăm, hàng nghìn trong số thập phân lần lượt được viết từ trái sang phải, từ thấp đến cao.
 
     Trên thực tế, ta sẽ biểu diễn bitmask bằng các số nguyên (ví dụ như các kiểu ```int``` hay ```long long``` trong C++), hoặc các cấu trúc dữ liệu bit như ```bitset``` của C++.
 
 - Trong một bitmask, **bit thứ $i$ bật** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $1$. Tương tự, **bit thứ $i$ tắt** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $0$.
 
-## Các toán tử thao tác Bit (Bitwise Operators) cơ bản
+## Các toán tử thao tác bit (Bitwise Operators) cơ bản
 
 ### Toán tử BITSHIFT LEFT (<<)
 
@@ -45,11 +45,11 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
 Ví dụ, xét số ```5 = 0b101```, nếu thực hiện phép toán ```0b101<<2```, ta nhận được ```0b10100 = 20```.
 
-Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau của phép toán Bitshift Left: ```a << b``` $= a * 2^b$. Ta có tính chất này do phép toán Bitshift Left ```a<<b``` có thể hiểu là thêm ```b``` chữ số $0$ vào cuối biểu diễn nhị phân của số ```a```. Điều này tương tự như việc thêm một chữ số $0$ vào cuối biểu diễn thập phân của một số sẽ nhân số đó thêm 10 lần.
+Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau của phép toán Bitshift Left: ```a << b``` $= a * 2^b$. Ta có tính chất này do phép toán Bitshift Left ```a << b``` có thể hiểu là thêm ```b``` chữ số $0$ vào cuối biểu diễn nhị phân của số ```a```. Điều này tương tự như việc thêm một chữ số $0$ vào cuối biểu diễn thập phân của một số sẽ nhân số đó thêm 10 lần.
 
-#### Chú ý với C++
+#### Chú ý
 
-Trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
+Với C++, trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
 
 1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất.
 2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó.
@@ -62,25 +62,25 @@ Nếu như Left Shift là thêm chữ số $0$ vào bên phải của một số
 
 Ví dụ, xét số ```13 = 0b1101```, ta có ```0b1101 >> 2 = 0b11```.
 
-Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$ với $a$ nguyên không âm
+Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$ với $a$ nguyên không âm.
 
 #### Phân biệt Logical Right Shift và Arithmetic Right Shift
 
-Riêng đối với Right Shift, hầu hết các cấu trúc máy tính cung cấp hai loại phép toán khác nhau.
+Riêng đối với Right Shift, hầu hết các cấu trúc máy tính cung cấp hai loại phép toán khác nhau là Logical Right Shift và Arithmetic Right Shift.
 
-Khác biệt duy nhất giữa Logical Right Shift và Arithmetic Right Shift là Logical Right Shift điền các bit bên trái mới được thêm bằng $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu (bit thứ $31$ đối với kiểu ```int```, và bit thứ $63$ đối với kiểu ```long long```).
+Khác biệt duy nhất giữa hai loại phép toán này là Logical Right Shift điền các bit bên trái mới được thêm bằng $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu (bit thứ $31$ đối với kiểu ```int```, và bit thứ $63$ đối với kiểu ```long long```).
 
 Chẳng hạn, ta sử dụng kiểu số ```char``` có 8 bit, và thực hiện phép toán ```0b```**```101```**```01101 >> 5```. Logical Right Shift sẽ trả về kết quả ```0b00000```**```101```**, nhưng Arithmetic Right Shift sẽ trả về ```0b11111```**```101```**.
 
 Chắc chắn khi đọc đến đây, các bạn sẽ tự hỏi về ý nghĩa của phép Arithmetic Right Shift. Trong trường hợp toán hạng ```a``` là số không âm, hai phép toán hoạt động tương đương. Tuy nhiên, trong trường hợp ```a``` âm, phép Logical Right Shift không có ý nghĩa về mặt toán học, mà đơn giản chỉ là đẩy các bit sang phải. Trong khi đó, phép Arithmetic Right Shift sẽ vẫn đảm bảo tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$. Chú ý rằng kết quả của phép toán sẽ được làm tròn xuống, chẳng hạn như ```-7 >> 2``` $= \frac{-7}{2^2} = -1.75$ được làm tròn xuống $-2$.
 
-Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn bằng dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
+Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn dưới dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
 
-Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì phép ```>>``` sẽ là Arithmetic Right Shift.
+Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì phép Arithmetic Right Shift sẽ được sử dụng.
 
 ### Toán tử Bitwise AND (&), OR (|) và XOR (^)
 
-Việc sử dụng ba toán tử này có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng Bit của các toán hạng (operands). Nói cách khác, nếu ký hiệu $a_i$ là bit thứ $i$ của bitmask $a$, việc thực hiện phép toán $c = a \oplus b$ trong đó $a, b, c$ là các bitmask và $\oplus$ là một phép toán nào đó sẽ tương đương với việc thực hiện $c_i = a_i \oplus b_i \forall 0 \leq i$.
+Việc sử dụng ba toán tử này có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng bit của các toán hạng (operands). Nói cách khác, nếu ký hiệu $a_i$ là bit thứ $i$ của bitmask $a$, việc thực hiện phép toán $c := a \oplus b$ trong đó $a, b, c$ là các bitmask và $\oplus$ là một phép toán nào đó sẽ tương đương với việc thực hiện $c_i := a_i \oplus b_i \forall 0 \leq i$.
 
 Định nghĩa của các phép toán này như sau:
 
@@ -94,14 +94,13 @@ Việc sử dụng ba toán tử này có thể được hiểu nôm na là th�
 
     Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b01001101```.
 
-
 ### Toán tử Bitwise NOT (~)
 
-Toán tử Bitwise NOT có lẽ là toán tử đơn giản nhất. Toán tử này nhận vào một toán hạng $A$ trả về phần bù của toán hạng này. Nói cách khác, định nghĩa của NOT là trả về False khi và chỉ khi toán hạng là True.
+Toán tử Bitwise NOT có lẽ là toán tử đơn giản nhất. Toán tử này nhận vào một toán hạng $A$ và trả về phần bù của toán hạng này. Nói cách khác, định nghĩa của NOT là trả về False khi và chỉ khi toán hạng là True.
 
 Ví dụ, ta có ```~0b10100100 = 0b01011011``` (trong trường hợp đầu vào là kiểu số có 8 bit).
 
-Cần chú ý, do máy tính chỉ quan tâm tới số lượng bit của kiểu số đầu vào, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (có 8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
+Cần chú ý, khi sử dụng phép NOT, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
 
 ## Các hàm thao tác Bit
 
@@ -113,9 +112,9 @@ Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```
 
 Chẳng hạn, ta có ```std::popcount(0b100101) = 3```.
 
-Đối với các chuẩn C++ cũ hơn, compiler GCC cung cấp các hàm tương tự là ```std::__builtin_popcount(x)``` cho kiểu ```unsigned int``` và ```std::__builtin_popcountll(x)``` cho kiểu ```unsigned long long```.
+Đối với các chuẩn C++ cũ hơn, compiler GCC cung cấp các hàm tương tự là ```std::__builtin_popcount(x)``` (population count) cho kiểu ```unsigned int``` và ```std::__builtin_popcountll(x)``` cho kiểu ```unsigned long long```.
 
-Chú ý: Đối với các hàm có dạng ```std::__builtin```, thêm đuôi ```ll``` sẽ gọi hàm đó với kiểu đầu vào là ```unsigned long long```.
+Chú ý: Đối với các hàm có dạng ```std::__builtin```, thêm đuôi ```ll``` sẽ gọi hàm đó với kiểu đầu vào là ```unsigned long long```. Vì vậy, người viết sẽ không nhắc đến các biến thể này ở các phần sau nữa.
 
 Ngoài ra, GCC cũng cung cấp hàm ```std::__builtin_parity(x)``` trả về ```std::popcount(x) % 2```. Hàm này thường được sử dụng trong các bài toán liên quan tới bao hàm loại trừ.
 
@@ -139,9 +138,9 @@ Hàm tương đương của GCC là ```std:::__builtin_ctz(x)``` (count trailing
 
 ### Truy cập Bit
 
-Một ứng dụng thường thấy của các phép toán Bit là đọc và sửa từng bit trong một bitmask.
+Một ứng dụng thường thấy của các phép toán bit là đọc và sửa từng bit trong một bitmask.
 
-Chẳng hạn, để truy cập bit thứ $i$ trong bitmask $A$, ta có thể sử dụng phép toán ```A & (1<<i)```. Trước khi đọc giải thích của phép toán này, hãy dành ra một chút thời gian để tự mình chạy thử một số ví dụ.
+Chẳng hạn, để truy cập bit thứ $i$ trong bitmask $A$, ta có thể sử dụng phép toán ```A & (1<<i)```. Trước khi đọc giải thích của phép toán này, hãy tự mình chạy thử một số ví dụ.
 
 Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép toán ```0b1010010 & (1<<4) = 0b1010010 & 0b10000 = 0b10000```. Xét phần thứ hai của phép toán, ```1<<i```, ta nhận thấy rằng, về bản chất, phần này thực hiện thao tác tạo ra một bitmask chỉ có bit thứ $i$ bật. Bitmask này khi được AND với bitmask ban đầu sẽ loại bỏ thông tin của tất cả mọi bit ngoại trừ bit thứ $i$.
 
@@ -167,15 +166,17 @@ Hậu tố ```ULL``` đánh dấu cho compiler biết rằng ```1ULL``` cần đ
 
 ### Chỉnh sửa Bit
 
-Sử dụng phương pháp tương tự như phần trên, ta có một số phép sửa Bit như sau:
+Sử dụng phương pháp tương tự như phần trên, ta có một số phép sửa bit như sau:
 
-1. Gán một Bit bằng $0$ với ```A & ~(1<<i)```.
-2. Gán một Bit bằng $1$ với ```A | (1<<i)```.
-3. Flip một Bit (từ $0$ sang $1$ hoặc từ $1$ sang $0$) với ```A ^ (1<<i)```.
+1. Gán một bit bằng $0$ với ```A & ~(1<<i)```.
+2. Gán một bit bằng $1$ với ```A | (1<<i)```.
+3. Flip một bit (từ $0$ sang $1$ hoặc từ $1$ sang $0$) với ```A ^ (1<<i)```.
 
-### Tắt các Bit cao nhất của một bitmask
+### Tắt các bit cao nhất của một bitmask
 
-Để lấy các bit trong khoảng từ $0$ tới $i-1$ của một bitmask, hay đồng loạt tắt tất cả các bit từ $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Phép toán ```((1<<i) - 1)``` tạo ra bitmask mà trong đó chỉ các bit từ $0$ tới $i-1$ được bật lên.
+Phép toán ```((1<<i) - 1)``` tạo ra bitmask mà trong đó chỉ các bit từ $0$ tới $i-1$ được bật lên.
+
+Như vậy, để tắt tất cả các bit từ vị trí $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Đây là cách đẻ ta loại bỏ các bit thừa sau khi thực hiện phép bitwise NOT.
 
 ### Biểu diễn tập hợp
 
@@ -190,7 +191,7 @@ Một số các phép toán tập hợp có thể thực hiện bằng các phé
 5. Kiểm tra $A$ là tập con của $B$ bằng ```A & B == A```.
 6. Tạo tập hợp $A$ chỉ có phần tử thứ $i$ bằng ```1 << i```.
 7. Hiệu của hai tập hợp $A$ và $B$ bằng ```(A ^ B) & A```.
-8. Phần bù của tập hợp $B$ trong $A$ băng ```A & ~B```.
+8. Phần bù của tập hợp $B$ trong $A$ bằng ```A & ~B```.
 
 ### Lặp qua mọi tập con của tập cho trước
 
@@ -202,9 +203,9 @@ void loop_subset(const vector<int> &s){
         vector<int> a;
         for (int j=0; j<s.size(); j++){
             if (i & (1<<j))
-                s[i].push_back(s[j]);
+                a.push_back(s[j]);
         }
-        // Thực hiện thao tác gì đó với tập con $A$
+        // Thực hiện thao tác gì đó với tập con A
     }
 }
 ```
@@ -222,7 +223,7 @@ void loop_mask_subset(int S){
 }
 ```
 
-Độ phức tạp của vòng lặp trên là $2^{|S|}$, chính là số tập con của $S$. Như vậy, nếu như ta lặp mọi tập $S$ từ $0$ tới $2^n$, sau đó lặp mọi tập con của $S$, độ phức tạp thời gian sẽ là $3^n$.
+Độ phức tạp của vòng lặp trên là $2^{|S|}$ với $|S|$ là số lượng bit bật của $S$, chính là số tập con của $S$. Như vậy, nếu như ta lặp mọi tập $S$ từ $0$ tới $2^n$, sau đó lặp mọi tập con của $S$, độ phức tạp thời gian sẽ là $3^n$.
 
 ### Cài đặt cấu trúc dữ liệu Fenwick Tree
 
@@ -245,10 +246,10 @@ Phần chứng minh cho bài toán này bạn đọc có thể tham khảo ở b
 ```c++
 unsigned long long solve(const vector<unsigned long long> &a, unsigned long long n){
     unsigned long long result = 0;
-    for (int i = 0; i < (1<<a.size()); i++){
+    for (int i = 0; i < 1<<a.size(); i++){
         unsigned long long b = 1;
         for (int j=0; j<a.size(); j++){
-            if (i & (1<<j)) b *= a[j];
+            if (i & 1<<j) b *= a[j];
         }
         unsigned long long x = result / b + 1;
         if (__builtin_parity(i)) result -= x;
@@ -262,4 +263,4 @@ Chú ý: Đoạn code này chỉ mang tính chất minh họa, do trên thực t
 
 ### Tăng tốc cho code
 
-Nếu sử dụng kiểu dữ liệu ```unsigned long long```, ta có thể thực hiện 64 phép AND, OR, XOR, hoặc NOT trong một thao tác. Trên thực tế, khi dịch, một số các compiler có thể giúp bạn thực hiện $256$ hay thậm chí $512$ phép toán như vậy cùng một lúc. Như vậy, một số bài toán với giới hạn như $n \leq 5*10^4$ hay thậm chí $n \leq 10^5$ có thể chạy được với độ phức tạp $O(n^2)$. Tuy nhiên, do giới hạn của bài viết, chủ đề này sẽ không được bàn đến ở đây.
+Nếu sử dụng kiểu dữ liệu ```unsigned long long```, ta có thể thực hiện 64 phép AND, OR, XOR, hoặc NOT trong một thao tác. Trên thực tế, khi dịch, một số các compiler có thể giúp bạn thực hiện $256$ hay thậm chí $512$ phép toán như vậy cùng một lúc. Như vậy, một số bài toán với giới hạn như $n \leq 5*10^4$ hay thậm chí $n \leq 10^5$ có thể chạy qua được với độ phức tạp $O(n^2)$. Tuy nhiên, do giới hạn của bài viết, chủ đề này sẽ không được bàn đến ở đây.
