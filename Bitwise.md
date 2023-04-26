@@ -11,6 +11,7 @@ Các phép toán với bit (Bitwise Operators) là một tập hợp các toán 
 Một số đoạn code trong bài viết chỉ đảm bảo hoạt động với compiler GCC. Các đoạn này sẽ được viết kèm theo mục Chú ý ở phía dưới.
 
 Các khái niệm sau được sử dụng xuyên suốt bài viết:
+
 - **Bảng chân lý (Truth Table)** của một toán tử Bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó. Sau đây là bảng chân lý của một số các toán tử sẽ được giới thiệu trong bài viết này
 
 <center>
@@ -102,10 +103,28 @@ Ví dụ, ta có ```~0b10100100 = 0b01011011``` (trong trường hợp đầu v�
 Cần chú ý, do máy tính chỉ quan tâm tới số lượng bit của kiểu số đầu vào, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (có 8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
 
 ## Các hàm thao tác Bit
-[//]: <> (TODO: C++20 functions)
-### Hàm POPCOUNT, PARITY
 
-### Hàm CLZ, __lg
+C++ hiện nay hỗ trợ một số các hàm liên quan tới xử lý bit giúp ta thực hiện một số các phép tính thông dụng với độ phức tạp thời gian $O(1)$.
+
+### Hàm POPCOUNT
+
+Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::popcount(int x)```. Hàm này trả về số lượng bit bật trong bitmask $x$.
+
+Chẳng hạn, ta có ```std::popcount(0b100101) = 3```.
+
+Đối với các chuẩn C++ cũ hơn, compiler GCC cung cấp các hàm tương tự là ```std::__builtin_popcount(x)``` cho kiểu ```unsigned int``` và ```std::__builtin_popcountll(x)``` cho kiểu ```unsigned long long```.
+
+Chú ý: Đối với các hàm có dạng ```std::__builtin```, thêm đuôi ```ll``` sẽ gọi hàm đó với kiểu đầu vào là ```unsigned long long```.
+
+Ngoài ra, GCC cũng cung cấp hàm ```std::__builtin_parity(x)``` trả về ```std::popcount(x) % 2```. Hàm này thường được sử dụng trong các bài toán liên quan tới bao hàm loại trừ.
+
+### Hàm COUNTL_ZERO
+
+Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::countl_zero(x)``` trả về số lượng bit $0$ ở bên trái của biến đầu vào.
+
+Chẳng hạn, ```countl_zero(int(0b10)) == 30``` (do kiểu ```int``` có 32 bit).
+
+GCC cũng có hàm ```__builtin_clz(x)```. Tuy nhiên, hàm này trả về kết quả không xác định đói với ```x == 0```.
 
 ### Hàm CTZ, FFS
 
@@ -142,6 +161,7 @@ Như đã nói ở phần đầu bài viết, ứng dụng đơn giản nhất c
 Khi đó, các phép toán AND, OR, XOR, NOT lần lượt tương ứng với các phép lấy giao, lấy hợp, lấy hiệu đối xứng, và lấy phần bù của tập hợp.
 
 Các phép toán tập hợp khác cũng có thể được biểu diễn bằng bitmask, ví dụ như:
+
 1. Kiểm tra $A$ là tập con của $B$ bằng ```A & B == A```.
 2. Tạo tập hợp $A$ chỉ có phần tử thứ $i$ bằng ```1 << i```.
 3. Hiệu của hai tập hợp $A$ và $B$ bằng ```(A ^ B) & A```.
@@ -157,9 +177,11 @@ for (int i=S; true; i = (i-1) & S) {
     if (i == 0) break;
 }
 ```
+
 Độ phức tạp của vòng lặp trên là $2^{|S|}$, chính là số tập con của $S$. Như vậy, nếu như ta lặp mọi tập $S$ từ $0$ tới $2^n$, sau đó lặp mọi tập con của $S$, độ phức tạp thời gian sẽ là $3^n$.
 
 #### Cài đặt cấu trúc dữ liệu Fenwick Tree
 
 Cách cài đặt [Fenwick Tree](https://vnoi.info/wiki/algo/data-structures/fenwick.md) tối ưu cũng là một trong những ứng dụng thú vị của các toán tử Bit.
 
+#### Giải các bài toán bao hàm loại trừ
