@@ -154,16 +154,16 @@ Ngoài ra cũng có một số các cách khác để truy cập bit, ví dụ n
 Chú ý: Một lỗi rất hay gặp phải khi sử dụng bitshift để truy cập và chỉnh sửa bit là tràn số. Chẳng hạn, xét dòng code sau đây:
 
 ```c++
-bool get_bit(unsigned long long a, int pos){
-    return a & (1<<pos)
+bool get_bit(unsigned long long mask, int pos){
+    return mask & (1<<pos)
 }
 ```
 
 Trong trường hợp $pos \geq 32$, biểu thức ```1<<pos``` sẽ bị tràn số do cả ```1``` và ```pos``` đều có kiểu ```int```. Để tránh bị tràn số, ta đổi đoạn code trên thành như sau:
 
 ```c++
-bool get_bit(long long a, int pos){
-    return a & (1ULL << pos);
+bool get_bit(unsigned long long mask, int pos){
+    return mask & (1ULL << pos);
 }
 ```
 
@@ -221,14 +221,45 @@ void loop_subset(const vector<int> &s){
 
 ```c++
 void loop_mask_subset(int S){
-    for (int i=S; true; i = (i-1) & S) {
-        // Thực hiện thao tác nào đó với tập con i của S
-        if (i == 0) break;
+    for (int mask=S; true; mask = (mask-1) & S) {
+        // Thực hiện thao tác nào đó với tập con mák của S
+        if (mask == 0) break;
     }
 }
 ```
 
-Độ phức tạp của vòng lặp trên là $2^{|S|}$ với $|S|$ là số lượng bit bật của $S$, chính là số tập con của $S$. Như vậy, nếu như ta lặp mọi tập $S$ từ $0$ tới $2^n$, sau đó lặp mọi tập con của $S$, độ phức tạp thời gian sẽ là $3^n$.
+Độ phức tạp của vòng lặp trên là $2^{|S|}$ với $|S|$ là số lượng bit bật của $S$, chính là số tập con của $S$.
+
+Như vậy, ta có cách để lặp mọi tập $S$ từ $0$ tới $2^n$, sau đó lặp mọi tập con $T$ của $S$ một cách hiệu quả.
+
+```c++
+void loop_subset_of_all_masks(int n){
+    for (int S = 0; S < 1<<n; S++) {
+        // Thực hiện thao tác nào đó với tập con S
+        for (int T=S; true; T = (T-1) & S) {
+            // Thực hiện thao tác nào đó với tập con T của S
+        }
+    }
+}
+```
+
+Cách cài đặt trên có độ phức tạp thời gian tối ưu do tất cả các lần lặp đều tạo ra một bộ $(S, T)$ thỏa mãn, và đôi một phân biệt. Ta sẽ chứng minh tổng độ phức tạp thời gian của hai vòng lặp này là $O(3^n)$.
+
+Dễ dàng nhận thấy, số bước lặp của hai vòng lặp trên có thể viết là:
+$$
+\begin{align}
+\sum_{S \subseteq 2^n} \sum_{T \subseteq S} 1 &= \sum_{S \subseteq 2^n} 2^{|S|} \\
+&= \sum_{k = 0}^n \sum_{S \subseteq 2^n, |S| = k} 2^k \\
+&= \sum_{k = 0}^n \binom{n}{k} 2^k \\
+&= 3^n
+\end{align}
+$$
+
+Nếu bạn thấy chứng minh trên khó hiểu, hãy xem chứng minh của Ứng dụng tiếp theo.
+
+### Lặp qua mọi bộ $x$ tập con phân biệt
+
+#### Trường hợp $x = 2$
 
 ### Cài đặt cấu trúc dữ liệu Fenwick Tree
 
