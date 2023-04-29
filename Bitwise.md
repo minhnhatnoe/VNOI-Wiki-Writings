@@ -38,13 +38,33 @@ Việc sử dụng ba toán tử này có thể được hiểu nôm na là th�
 
 1. **AND** trả về True khi và chỉ khi cả hai toán hạng là True.
 
-    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b10100010```
+    Ví dụ, ta có:
+
+    ```c++
+      0b11100010
+    & 0b10101111
+    = 0b10100010
+    ```
+
 2. **OR** trả về True khi và chỉ khi ít nhất một toán hạng là True.
 
-    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b11101111```.
+    Ví dụ, ta có:
+
+    ```c++
+      0b11100010
+    | 0b10101111
+    = 0b11101111
+    ```
+
 3. **XOR** trả về True khi và chỉ khi hai toán hạng có giá trị khác nhau. Một cách hiểu khác cho **XOR** là phép cộng theo modulo 2.
 
-    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b01001101```.
+    Ví dụ, ta có:
+
+    ```c++
+      0b11100010
+    ^ 0b10101111
+    = 0b01001101
+    ```
 
 Sau đây là bảng chân lý của các toán tử này
 
@@ -64,9 +84,16 @@ Sau đây là bảng chân lý của các toán tử này
 
 Toán tử Bitwise NOT có lẽ là toán tử đơn giản nhất. Toán tử này nhận vào một toán hạng $A$ và trả về phần bù của toán hạng này. Nói cách khác, định nghĩa của NOT là trả về False khi và chỉ khi toán hạng là True.
 
-Ví dụ, ta có ```~0b10100100 = 0b01011011``` (trong trường hợp đầu vào là kiểu số có 8 bit).
+Ví dụ, ta có:
 
-Cần chú ý, khi sử dụng phép NOT, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
+```c++
+ ~0b10100100
+= 0b01011011
+```
+
+Chú ý rằng biểu thức trên chỉ đúng trong trường hợp đầu vào là kiểu số có 8 bit. Cụ thể hơn, cần chú ý:
+
+Khi sử dụng phép NOT, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
 
 ### Toán tử BITSHIFT LEFT (<<)
 
@@ -78,12 +105,12 @@ Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau 
 
 #### Chú ý
 
-Với C++, trong trường hợp phép toán của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
+Với C++, trong trường hợp phép toán ```a << b``` của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
 
-1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất.
-2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó.
+1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất. Nói cách khác, gọi số bit của kiểu số kết quả là $c$ ($c$ là $32$ với ```unsigned int```, và $64$ với ```unsigned long long```), kết quả trả về sẽ được tính theo modulo ```2^c```.
+2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó. Điều tương tự xảy ra nếu toán hạng ```a``` của bạn là một số âm.
 
-Trong phép toán ```a << b```, nếu giá trị của ```b``` là âm hoặc lớn hơn hoặc bằng số lượng bit mà kiểu số của kết quả hỗ trợ ($64$ đối với ```(unsigned) long long``` và $32$ đối với ```(unsigned) int```), kết quả trả về của phép toán là không xác định.
+Ngoài ra, nnếu giá trị của ```b``` là âm hoặc lớn hơn hoặc bằng số lượng bit mà kiểu số của kết quả hỗ trợ ($64$ đối với ```(unsigned) long long``` và $32$ đối với ```(unsigned) int```), kết quả trả về của phép toán là không xác định.
 
 ### Toán tử BITSHIFT RIGHT (>>)
 
@@ -147,7 +174,15 @@ Một ứng dụng thường thấy của các phép toán bit là đọc và s�
 
 Chẳng hạn, để truy cập bit thứ $i$ trong bitmask $A$, ta có thể sử dụng phép toán ```A & (1<<i)```. Trước khi đọc giải thích của phép toán này, hãy tự mình chạy thử một số ví dụ.
 
-Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép toán ```0b1010010 & (1<<4) = 0b1010010 & 0b10000 = 0b10000```. Xét phần thứ hai của phép toán, ```1<<i```, ta nhận thấy rằng, về bản chất, phần này thực hiện thao tác tạo ra một bitmask chỉ có bit thứ $i$ bật. Bitmask này khi được AND với bitmask ban đầu sẽ loại bỏ thông tin của tất cả mọi bit ngoại trừ bit thứ $i$.
+Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép toán ```0b1010010 & (1<<4)``` như sau:
+
+```c++
+  0b1010010
+& 0b0010000
+= 0b0010000
+```
+
+Xét phần thứ hai của phép toán, ```1<<i```, ta nhận thấy rằng, về bản chất, phần này thực hiện thao tác tạo ra một bitmask chỉ có bit thứ $i$ bật. Bitmask này khi được AND với bitmask ban đầu sẽ loại bỏ thông tin của tất cả mọi bit ngoại trừ bit thứ $i$.
 
 Ngoài ra cũng có một số các cách khác để truy cập bit, ví dụ như ```(A >> i) % 2```, hay ```(A >> i) & 1```.
 
@@ -175,13 +210,13 @@ Sử dụng phương pháp tương tự như phần trên, ta có một số ph�
 
 1. Gán một bit bằng $0$ với ```A & ~(1<<i)```.
 2. Gán một bit bằng $1$ với ```A | (1<<i)```.
-3. Flip một bit (từ $0$ sang $1$ hoặc từ $1$ sang $0$) với ```A ^ (1<<i)```.
+3. Lật (flip) một bit (từ $0$ sang $1$ hoặc từ $1$ sang $0$) với ```A ^ (1<<i)```.
 
 ### Tắt các bit cao nhất của một bitmask
 
 Phép toán ```((1<<i) - 1)``` tạo ra bitmask mà trong đó chỉ các bit từ $0$ tới $i-1$ được bật lên.
 
-Như vậy, để tắt tất cả các bit từ vị trí $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Đây là cách đẻ ta loại bỏ các bit thừa sau khi thực hiện phép bitwise NOT.
+Như vậy, để tắt tất cả các bit từ vị trí $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Đây là cách để ta loại bỏ các bit thừa sau khi thực hiện phép bitwise NOT.
 
 ### Biểu diễn tập hợp
 
@@ -204,11 +239,11 @@ Một số các phép toán tập hợp có thể thực hiện bằng các phé
 
 ```c++
 void loop_subset(const vector<int> &s){
-    for (int i=0; i<(1<<s.size()); i++){
+    for (int mask=0; mask<(1<<s.size()); mask++){
         vector<int> a;
-        for (int j=0; j<s.size(); j++){
-            if (i & (1<<j))
-                a.push_back(s[j]);
+        for (int i=0; i<s.size(); i++){
+            if (mask & (1<<i))
+                a.push_back(s[i]);
         }
         // Thực hiện thao tác gì đó với tập con A
     }
@@ -243,7 +278,7 @@ void loop_subset_of_all_masks(int n){
 }
 ```
 
-Cách cài đặt trên có độ phức tạp thời gian tối ưu do tất cả các lần lặp đều tạo ra một bộ $(S, T)$ thỏa mãn, và đôi một phân biệt. Ta sẽ chứng minh tổng độ phức tạp thời gian của hai vòng lặp này là $O(3^n)$.
+Cách cài đặt trên có độ phức tạp thời gian tối ưu do tất cả các lần lặp đều tạo ra một bộ $(S, T)$ thỏa mãn, và đôi một phân biệt. Ta sẽ chứng minh tổng độ phức tạp thời gian của hai vòng lặp này là $O(3^n)$, thay vì $O(4^n)$.
 
 Dễ dàng nhận thấy, số bước lặp của hai vòng lặp trên có thể viết là:
 $$
