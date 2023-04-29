@@ -12,18 +12,7 @@ Một số đoạn code trong bài viết chỉ đảm bảo hoạt động vớ
 
 Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
-- **Bảng chân lý (Truth Table)** của một toán tử bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó. Sau đây là bảng chân lý của một số các toán tử sẽ được giới thiệu trong bài viết này
-
-<div align="center">
-
-|a|b|AND|OR|XOR|
-|:-|:-|:-|:-|:-|
-|1|1|1|1|0|
-|1|0|0|1|1|
-|0|1|0|1|1|
-|0|0|0|0|0|
-
-</div>
+- **Bảng chân lý (Truth Table)** của một toán tử bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó.
 
 - **Biểu diễn dạng nhị phân của một số** được đánh dấu bằng tiền tố ```0b```. Chẳng hạn, với số ```12``` có biểu diễn nhị phân là ```1100```, ta viết ```12 = 0b1100```. Đây cũng là cách viết được chấp nhận trong code C++.
 
@@ -37,7 +26,47 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
 - Trong một bitmask, **bit thứ $i$ bật** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $1$. Tương tự, **bit thứ $i$ tắt** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $0$.
 
+- **Undefined Behaviour (UB)** được dùng để chỉ một đoạn code không có hành vi cố định. Nói cách khác, ta không biết đoạn code đó sẽ làm gì. Một đoạn code UB có thể trả về kết quả sai, làm chương trình gặp lỗi, hay trả về các kết quả khác nhau với hai lần chạy khác nhau, hoặc thậm chí là với compiler khác nhau.
+
 ## Các toán tử thao tác bit (Bitwise Operators) cơ bản
+
+### Toán tử Bitwise AND (&), OR (|) và XOR (^)
+
+Việc sử dụng ba toán tử này có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng bit của các toán hạng (operands). Nói cách khác, nếu ký hiệu $a_i$ là bit thứ $i$ của bitmask $a$, việc thực hiện phép toán $c := a \oplus b$ trong đó $a, b, c$ là các bitmask và $\oplus$ là một phép toán nào đó sẽ tương đương với việc thực hiện $c_i := a_i \oplus b_i \forall 0 \leq i$.
+
+Định nghĩa của các phép toán này như sau:
+
+1. **AND** trả về True khi và chỉ khi cả hai toán hạng là True.
+
+    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b10100010```
+2. **OR** trả về True khi và chỉ khi ít nhất một toán hạng là True.
+
+    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b11101111```.
+3. **XOR** trả về True khi và chỉ khi hai toán hạng có giá trị khác nhau. Một cách hiểu khác cho **XOR** là phép cộng theo modulo 2.
+
+    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b01001101```.
+
+Sau đây là bảng chân lý của các toán tử này
+
+<!-- markdownlint-disable-next-line no-inline-html -->
+<div align="center">
+
+|a|b|AND|OR|XOR|
+|:-|:-|:-|:-|:-|
+|1|1|1|1|0|
+|1|0|0|1|1|
+|0|1|0|1|1|
+|0|0|0|0|0|
+
+</div>
+
+### Toán tử Bitwise NOT (~)
+
+Toán tử Bitwise NOT có lẽ là toán tử đơn giản nhất. Toán tử này nhận vào một toán hạng $A$ và trả về phần bù của toán hạng này. Nói cách khác, định nghĩa của NOT là trả về False khi và chỉ khi toán hạng là True.
+
+Ví dụ, ta có ```~0b10100100 = 0b01011011``` (trong trường hợp đầu vào là kiểu số có 8 bit).
+
+Cần chú ý, khi sử dụng phép NOT, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
 
 ### Toán tử BITSHIFT LEFT (<<)
 
@@ -77,30 +106,6 @@ Chắc chắn khi đọc đến đây, các bạn sẽ tự hỏi về ý nghĩa
 Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn dưới dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
 
 Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì phép Arithmetic Right Shift sẽ được sử dụng.
-
-### Toán tử Bitwise AND (&), OR (|) và XOR (^)
-
-Việc sử dụng ba toán tử này có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng bit của các toán hạng (operands). Nói cách khác, nếu ký hiệu $a_i$ là bit thứ $i$ của bitmask $a$, việc thực hiện phép toán $c := a \oplus b$ trong đó $a, b, c$ là các bitmask và $\oplus$ là một phép toán nào đó sẽ tương đương với việc thực hiện $c_i := a_i \oplus b_i \forall 0 \leq i$.
-
-Định nghĩa của các phép toán này như sau:
-
-1. **AND** trả về True khi và chỉ khi cả hai toán hạng là True.
-
-    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b10100010```
-2. **OR** trả về True khi và chỉ khi ít nhất một toán hạng là True.
-
-    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b11101111```.
-3. **XOR** trả về True khi và chỉ khi hai toán hạng có giá trị khác nhau. Một cách hiểu khác cho **XOR** là phép cộng theo modulo 2.
-
-    Ví dụ, ta có ```0b11100010 & 0b10101111 = 0b01001101```.
-
-### Toán tử Bitwise NOT (~)
-
-Toán tử Bitwise NOT có lẽ là toán tử đơn giản nhất. Toán tử này nhận vào một toán hạng $A$ và trả về phần bù của toán hạng này. Nói cách khác, định nghĩa của NOT là trả về False khi và chỉ khi toán hạng là True.
-
-Ví dụ, ta có ```~0b10100100 = 0b01011011``` (trong trường hợp đầu vào là kiểu số có 8 bit).
-
-Cần chú ý, khi sử dụng phép NOT, những bit không sử dụng ở bên trái cũng sẽ được bật lên. Chẳng hạn, khi thực hiện phép ```0b10``` với kiểu số ```char``` (8 bit), ta nhận được ```0b11111101``` thay vì ```0b01```. Trong đa số trường hợp, ta sẽ cần phải tắt các bit được bật thừa này đi.
 
 ## Các hàm thao tác Bit
 
