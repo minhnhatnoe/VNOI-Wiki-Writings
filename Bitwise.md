@@ -221,7 +221,7 @@ void loop_subset(const vector<int> &s){
 
 ```c++
 void loop_mask_subset(int S){
-    for (int mask=S; true; mask = (mask-1) & S) {
+    for (int mask=S; true; mask = (mask-1) & S){
         // Thực hiện thao tác nào đó với tập con mák của S
         if (mask == 0) break;
     }
@@ -234,9 +234,9 @@ Như vậy, ta có cách để lặp mọi tập $S$ từ $0$ tới $2^n$, sau �
 
 ```c++
 void loop_subset_of_all_masks(int n){
-    for (int S = 0; S < 1<<n; S++) {
+    for (int S = 0; S < 1<<n; S++){
         // Thực hiện thao tác nào đó với tập con S
-        for (int T=S; true; T = (T-1) & S) {
+        for (int T=S; true; T = (T-1) & S){
             // Thực hiện thao tác nào đó với tập con T của S
         }
     }
@@ -259,7 +259,68 @@ Nếu bạn thấy chứng minh trên khó hiểu, hãy xem chứng minh của �
 
 ### Lặp qua mọi bộ $x$ tập con phân biệt
 
+#### Bài toán
+
+Cho một tập $S$ độ dài $n$ và một số $x$. Hãy in ra tất cả các cách chia các phần tử trong $S$ vào $x$ tập hợp không giao nhau, sao cho mỗi phần tử nằm trong đúng một tập hợp.
+
+#### Nhận xét
+
+Rõ ràng, có $O(x^n)$ tập hợp thỏa mãn. Như vậy, độ phức tạp tốt nhất của bài toán này là $O(x^n)$.
+
 #### Trường hợp $x = 2$
+
+Rõ ràng, trong trường hợp này, ta chỉ cần lặp qua mọi tập con $S$ của $A$. Với mỗi lần lặp này, ta nhận được cặp tập hợp $(S, A \backslash S)$.
+
+#### Trường hợp $x = 3$
+
+Ta sẽ cố gắng mở rộng từ trường hợp $x = 2$ để có được thuật toán cho trường hợp này.
+
+Bước đầu tiên, ta sẽ lặp như trường hợp $x = 2$ để có được cặp tập hợp $(A, B)$.
+
+Bước thứ hai, ta sẽ lặp mọi tập con $C$ của tập $A$ để nhận được hai tập $(C, A \backslash C)$. Như vậy, bộ tập hợp thỏa mãn đề bài mà ta nhận được sẽ là $(B, A \backslash C, C)$. Chú ý, ở bước này, ta sử dụng kỹ thuật ở [Ứng dụng trước](#lặp-qua-mọi-tập-con-của-một-bitmask).
+
+Cài đặt cho trường hợp này như sau:
+
+```c++
+void loop_triplets(int n){
+    int S = (1<<n) - 1;
+    for (int A = S; true; A = (A - 1) & S){
+        int B = S ^ A;
+        for (int C = A; true; C = (C - 1) & A){
+            // In ra B, A^C, C
+            if (C == 0) break;
+        }
+        if (A == 0) break;
+    }
+}
+```
+
+Để ý rằng vòng lặp đầu tiên tương đương với việc lặp $A$ trong khoảng $[0, 2^n)$. Nếu thực hiện thay đổi này, ta sẽ nhận được cài đặt tương đương với hàm ```void loop_subset_of_all_masks(int n)``` ở trên. Đây cũng là một cách hiểu cho độ phức tạp $O(3^n)$ của hàm này.
+
+#### Trường hợp tổng quát $x \in Z^+$
+
+```c++
+void generate_partitions(vector<int> &sets, int mask, int x){
+    if (x == 1){
+        sets.push_back(x);
+        // Hàm thực hiện thao tác gì đó đối với sets
+        solve_for_sets(sets);
+        sets.pop_back();
+        return;
+    }
+    for (int s = mask; true; s = (s - 1) & mask){
+        sets.push_back(s);
+        generate_partitions(sets, mask ^ s, x-1);
+        sets.pop_back();
+        if (s == 0) break;
+    }
+}
+int main(){
+    int n = 10, parts = 5;
+    vector<int> sets;
+    generate_partitions(sets, (1<<n)-1, parts);
+}
+```
 
 ### Cài đặt cấu trúc dữ liệu Fenwick Tree
 
