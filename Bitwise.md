@@ -32,7 +32,7 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
 ### Toán tử Bitwise AND (&), OR (|) và XOR (^)
 
-Việc sử dụng ba toán tử này có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng bit của các toán hạng (operands). Nói cách khác, nếu ký hiệu $a_i$ là bit thứ $i$ của bitmask $a$, việc thực hiện phép toán $c := a \oplus b$ trong đó $a, b, c$ là các bitmask và $\oplus$ là một phép toán nào đó sẽ tương đương với việc thực hiện $c_i := a_i \oplus b_i \forall 0 \leq i$.
+Các toán tử này thuộc loại "Toán tử Bit Logic". Việc sử dụng các toán tử loại này có thể được hiểu nôm na là thực hiện các thao tác tương ứng trên từng bit của các toán hạng (operands). Nói cách khác, nếu ký hiệu $a_i$ là bit thứ $i$ của bitmask $a$, việc thực hiện phép toán $c := a \oplus b$ trong đó $a, b, c$ là các bitmask và $\oplus$ là một phép toán nào đó sẽ tương đương với việc thực hiện $c_i := a_i \oplus b_i \forall 0 \leq i$.
 
 Định nghĩa của các phép toán này như sau:
 
@@ -165,6 +165,26 @@ Phép toán ```31 - std::__builtin_clz(x)``` hay ```63 - std::__builtin_clzll(x)
 Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::countr_zero(x)``` trả về số lượng bit $0$ ở bên phải của biến đầu vào.
 
 Hàm tương đương của GCC là ```std:::__builtin_ctz(x)``` (count trailing zeroes). Tuy nhiên hàm này có giá trị không xác định với ```x == 0```. GCC cũng cung cấp một hàm khác là ```std::__builtin_ffs(x) == std::__builtin_ctz(x) + 1```. Trong trường hợp ```x == 0```, hàm này trả về $0$.
+
+### Sử dụng Pragma
+
+Đối với gần như tất cả ($>99\%$) những máy tính mà bạn sẽ gặp trong đời, các hàm phía trên có thể được thực hiện với chỉ $1$ instruction, hay nói cách khác là trong $O(1)$. Tuy nhiên, để hỗ trợ những máy tính rất cũ hoặc rất low-end, compiler GCC mặc định cài đặt các hàm trên bằng toán tử bit, chạy trong $O(\log_2 \log_2 n)$, với $n$ là số lượng bit trong kiểu số của bạn.
+
+Để mở khóa các instruction mới, các bạn cần phải sử dụng định hướng biên dịch ```#pragma GCC target```.
+
+Hầu hết mỗi hàm đều có một "flag" riêng biệt mà khi bật lên sẽ mở khóa instruction cho hàm đó. Tuy nhiên, nếu bạn mở khóa thừa thì code bạn vẫn chạy. Vì vậy, để code chạy nhanh hơn, bạn chỉ cần paste dòng sau vào đầu code (trước dòng ```#include```):
+
+```c++
+#pragma GCC target("popcnt,lzcnt,bmi,bmi2,abm")
+```
+
+Với một số Online Judge như Codeforces hay VNOJ, bạn cũng có thể viết định hướng biên dịch như sau:
+
+```c++
+#pragma GCC target("arch=skylake")
+```
+
+Trong đó ```skylake``` là tên kiến trúc CPU của máy chấm. Nếu bạn sử dụng kiến trúc CPU quá cũ, có khả năng các hàm của bạn không được tối ưu. Ngược lại, nếu bạn sử dụng kiến trúc CPU quá mới, chương trình của bạn khả năng cao sẽ nhận lại verdict SIGILL hoặc RTE do máy chấm không chạy được code của bạn.
 
 ## Ứng dụng
 
@@ -396,3 +416,32 @@ Chú ý: Đoạn code này chỉ mang tính chất minh họa, do trên thực t
 ### Tăng tốc cho code
 
 Nếu sử dụng kiểu dữ liệu ```unsigned long long```, ta có thể thực hiện 64 phép AND, OR, XOR, hoặc NOT trong một thao tác. Trên thực tế, khi dịch, một số các compiler có thể giúp bạn thực hiện $256$ hay thậm chí $512$ phép toán như vậy cùng một lúc. Như vậy, một số bài toán với giới hạn như $n \leq 5*10^4$ hay thậm chí $n \leq 10^5$ có thể chạy qua được với độ phức tạp $O(n^2)$. Tuy nhiên, do giới hạn của bài viết, chủ đề này sẽ không được bàn đến ở đây.
+
+## Tổng hợp một số điều cần chú ý trong C++
+
+Các thao tác bit trong C++ là một bộ công cụ rất mạnh và có hiệu suất cực đỉnh. Tất nhiên, with great power comes great responsibility. Khi sử dụng bộ công cụ này, rất nhiều những bug thú vị đang chờ đợi bạn.
+
+### Thứ tự tính toán (Operator Precendence)
+
+Thứ tự tính toán có thể được hiểu là thứ tự mà C++ sẽ tính toán các biểu thức của bạn, ví dụ như nhân chia trước, cộng trừ sau. Trang cppreference.com có dành hẳn một [bài viết](https://en.cppreference.com/w/cpp/language/operator_precedence) để nói về thứ tự này.
+
+Một số điểm cần chú ý trong thứ tự tính toán của C++ bao gồm:
+
+- Các phép bitshift ```<<, >>``` đứng sau phép ```+, -```.
+- Phép ```&, ^, |``` đứng sau phép ```==``` và các phép ```+, -, *, /, <<, >>```.
+
+Trong mọi trường hợp, kể cả khi đã nhớ kỹ thứ tự tính toán của các toán tử, bạn vẫn nên sử dụng dấu ```()``` khi làm việc với các toán tử bit để giúp code dễ đọc hơn và hạn chế bug.
+
+### Toán tử Bitshift
+
+Trong phép Bitshift Left, nếu toán tử đầu tiên của bạn là một số âm, hoặc kết quả tính toán của bạn tràn số, thì code của bạn sẽ bị UB.
+
+Đối với tất cả mọi phép bitshift, nếu toán tử thứ hai của bạn là một số âm, hoặc có giá trị lớn hơn hoặc bằng số lượng bit có trong kiểu số của kết quả, thì code của bạn bị UB. Trong gần như hầu hết trường hợp, chỉ có $5$ hoặc $6$ bit cuối cùng (lần lượt với hai trường hợp ```int``` và ```long long```) trong toán tử thứ hai được sử dụng, nên chúng ta có thể đoán trước được code sẽ làm gì. Tuy nhiên, không nên dựa vào tính chất này để viết code.
+
+### Tràn số khi truy cập bit
+
+Một lỗi thường gặp của những bạn mới làm quen với các toán tử bit là tràn số khi thực hiện phép ```1 << pos``` để truy cập bit. Bạn đọc có thể xem phần [Truy cập bit](#truy-cập-bit) để rõ hơn.
+
+### Không sử dụng định hướng ```#pragma``` ở đầu code
+
+Nếu sử dụng các hàm trong mục [Các hàm thao tác bit](#các-hàm-thao-tác-bit), bạn nên sử dụng định hướng biên dịch ```#pragma GCC target``` như đã được mô tả trong phần [Sử dụng Pragma](#sử-dụng-pragma). Tuy nhiên, trong phần lớn trường hợp, định hướng biên dịch này cũng chỉ giúp bạn tăng tốc code thêm khoảng $20\%$.
