@@ -8,11 +8,16 @@ Các phép toán với bit (Bitwise Operators) là một tập hợp các toán 
 
 ## Lưu ý trước khi đọc bài viết
 
+Trước khi đọc bài viết này, bạn cần trang bị kiến thức về các chủ đề sau:
+
+- Biểu diễn nhị phân của số nguyên.
+- Cách sử dụng AND (&&) và OR (||) đối với các toán hạng bool trong C++.
+
 Một số đoạn code trong bài viết chỉ đảm bảo hoạt động với compiler GCC. Các đoạn này sẽ được viết kèm theo mục Chú ý ở phía dưới.
 
 Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
-- **Bảng chân lý (Truth Table)** của một toán tử bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó.
+- **Bảng chân trị (Truth Table)** của một toán tử bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó.
 
 - **Biểu diễn dạng nhị phân của một số** được đánh dấu bằng tiền tố ```0b```. Chẳng hạn, với số ```12``` có biểu diễn nhị phân là ```1100```, ta viết ```12 = 0b1100```. Đây cũng là cách viết được chấp nhận trong code C++.
 
@@ -66,7 +71,7 @@ Các toán tử này thuộc loại "Toán tử Bit Logic". Việc sử dụng c
     = 0b01001101
     ```
 
-Sau đây là bảng chân lý của các toán tử này
+Sau đây là bảng chân trị của các toán tử này
 
 <!-- markdownlint-disable-next-line no-inline-html -->
 <div align="center">
@@ -277,7 +282,7 @@ void loop_subset(const vector<int> &s){
 ```c++
 void loop_mask_subset(int S){
     for (int mask=S; true; mask = (mask-1) & S){
-        // Thực hiện thao tác nào đó với tập con mák của S
+        // Thực hiện thao tác nào đó với tập con mask của S
         if (mask == 0) break;
     }
 }
@@ -419,7 +424,7 @@ Nếu sử dụng kiểu dữ liệu ```unsigned long long```, ta có thể th�
 
 ## Tổng hợp một số điều cần chú ý trong C++
 
-Các thao tác bit trong C++ là một bộ công cụ rất mạnh và có hiệu suất cực đỉnh. Tất nhiên, with great power comes great responsibility. Khi sử dụng bộ công cụ này, rất nhiều những bug thú vị đang chờ đợi bạn.
+Các thao tác bit trong C++ là một bộ công cụ rất mạnh và có hiệu suất cực đỉnh. Tất nhiên, "with great power comes great responsibility". Khi sử dụng bộ công cụ này, rất nhiều những bug thú vị đang chờ đợi bạn.
 
 ### Thứ tự tính toán (Operator Precendence)
 
