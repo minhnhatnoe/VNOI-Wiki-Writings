@@ -110,12 +110,9 @@ Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau 
 
 #### Chú ý
 
-Với C++, trong trường hợp phép toán ```a << b``` của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
+Với C++, không nên để phép toán ```a << b``` của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng) vì sẽ có trường hợp code của bạn bị UB. Để biết cụ thể về các trường hợp này, bạn có thể tham khảo phần [Phép Left Shift tràn số](#điều-gì-xảy-ra-nếu-phép-left-shift-tràn-số).
 
-1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất. Nói cách khác, gọi số bit của kiểu số kết quả là $c$ ($c$ là $32$ với ```unsigned int```, và $64$ với ```unsigned long long```), kết quả trả về sẽ được tính theo modulo ```2^c```.
-2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó. Điều tương tự xảy ra nếu toán hạng ```a``` của bạn là một số âm.
-
-Ngoài ra, nnếu giá trị của ```b``` là âm hoặc lớn hơn hoặc bằng số lượng bit mà kiểu số của kết quả hỗ trợ ($64$ đối với ```(unsigned) long long``` và $32$ đối với ```(unsigned) int```), kết quả trả về của phép toán là không xác định.
+Ngoài ra, nếu giá trị của ```b``` là âm hoặc lớn hơn hoặc bằng số lượng bit mà kiểu số của kết quả hỗ trợ ($64$ đối với ```(unsigned) long long``` và $32$ đối với ```(unsigned) int```), kết quả trả về của phép toán là không xác định.
 
 ### Toán tử BITSHIFT RIGHT (>>)
 
@@ -125,21 +122,9 @@ Ví dụ, xét số ```13 = 0b1101```, ta có ```0b1101 >> 2 = 0b11```.
 
 Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$ với $a$ nguyên không âm.
 
-#### Phân biệt Logical Right Shift và Arithmetic Right Shift
-
-Riêng đối với Right Shift, hầu hết các cấu trúc máy tính cung cấp hai loại phép toán khác nhau là Logical Right Shift và Arithmetic Right Shift.
-
-Khác biệt duy nhất giữa hai loại phép toán này là Logical Right Shift điền các bit bên trái mới được thêm bằng $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu (bit thứ $31$ đối với kiểu ```int```, và bit thứ $63$ đối với kiểu ```long long```).
-
-Chẳng hạn, ta sử dụng kiểu số ```char``` có 8 bit, và thực hiện phép toán ```0b```**```101```**```01101 >> 5```. Logical Right Shift sẽ trả về kết quả ```0b00000```**```101```**, nhưng Arithmetic Right Shift sẽ trả về ```0b11111```**```101```**.
-
-Chắc chắn khi đọc đến đây, các bạn sẽ tự hỏi về ý nghĩa của phép Arithmetic Right Shift. Trong trường hợp toán hạng ```a``` là số không âm, hai phép toán hoạt động tương đương. Tuy nhiên, trong trường hợp ```a``` âm, phép Logical Right Shift không có ý nghĩa về mặt toán học, mà đơn giản chỉ là đẩy các bit sang phải. Trong khi đó, phép Arithmetic Right Shift sẽ vẫn đảm bảo tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$. Chú ý rằng kết quả của phép toán sẽ được làm tròn xuống, chẳng hạn như ```-7 >> 2``` $= \frac{-7}{2^2} = -1.75$ được làm tròn xuống $-2$.
-
-Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn dưới dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
-
-Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì phép Arithmetic Right Shift sẽ được sử dụng.
-
 ## Các hàm thao tác Bit
+
+**Chú ý:** Tại thời điểm viết bài, hầu hết các kỳ thi chính thức chưa cho phép sử dụng chuẩn `C++20`. Nếu không chắc chắn, các bạn vui lòng chỉ sử dụng những biến thể không thuộc `C++20` của các hàm này
 
 C++ hiện nay hỗ trợ một số các hàm liên quan tới xử lý bit giúp ta thực hiện một số các phép tính thông dụng với độ phức tạp thời gian $O(1)$.
 
@@ -163,33 +148,13 @@ Chẳng hạn, ```std::countl_zero(int(0b10)) == 30``` (do kiểu ```int``` có 
 
 GCC cũng có hàm ```std::__builtin_clz(x)``` (count leading zeroes). Tuy nhiên, hàm này trả về kết quả không xác định đối với ```x == 0```.
 
-Phép toán ```31 - std::__builtin_clz(x)``` hay ```63 - std::__builtin_clzll(x)``` trả về $\lfloor \log_2(x) \rfloor$, thường được sử dụng trong cài đặt của Bảng thưa (Sparse Table) hoặc FFT.
+Phép toán ```31 - std::__builtin_clz(x)``` hay ```63 - std::__builtin_clzll(x)``` trả về $\lfloor \log_2(x) \rfloor$, thường được sử dụng trong cài đặt của Bảng thưa (Sparse Table).
 
 ### Hàm COUNTR_ZERO
 
 Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::countr_zero(x)``` trả về số lượng bit $0$ ở bên phải của biến đầu vào.
 
 Hàm tương đương của GCC là ```std:::__builtin_ctz(x)``` (count trailing zeroes). Tuy nhiên hàm này có giá trị không xác định với ```x == 0```. GCC cũng cung cấp một hàm khác là ```std::__builtin_ffs(x) == std::__builtin_ctz(x) + 1```. Trong trường hợp ```x == 0```, hàm này trả về $0$.
-
-### Sử dụng Pragma
-
-Đối với gần như tất cả ($>99\%$) những máy tính mà bạn sẽ gặp trong đời, các hàm phía trên có thể được thực hiện với chỉ $1$ instruction, hay nói cách khác là trong $O(1)$. Tuy nhiên, để hỗ trợ những máy tính rất cũ hoặc rất low-end, compiler GCC mặc định cài đặt các hàm trên bằng toán tử bit, chạy trong $O(\log_2 \log_2 n)$, với $n$ là số lượng bit trong kiểu số của bạn.
-
-Để mở khóa các instruction mới, các bạn cần phải sử dụng định hướng biên dịch ```#pragma GCC target```.
-
-Hầu hết mỗi hàm đều có một "flag" riêng biệt mà khi bật lên sẽ mở khóa instruction cho hàm đó. Tuy nhiên, nếu bạn mở khóa thừa thì code bạn vẫn chạy. Vì vậy, để code chạy nhanh hơn, bạn chỉ cần paste dòng sau vào đầu code (trước dòng ```#include```):
-
-```c++
-#pragma GCC target("popcnt,lzcnt,bmi,bmi2,abm")
-```
-
-Với một số Online Judge như Codeforces hay VNOJ, bạn cũng có thể viết định hướng biên dịch như sau:
-
-```c++
-#pragma GCC target("arch=skylake")
-```
-
-Trong đó ```skylake``` là tên kiến trúc CPU của máy chấm. Nếu bạn sử dụng kiến trúc CPU quá cũ, có khả năng các hàm của bạn không được tối ưu. Ngược lại, nếu bạn sử dụng kiến trúc CPU quá mới, chương trình của bạn khả năng cao sẽ nhận lại verdict SIGILL hoặc RTE do máy chấm không chạy được code của bạn.
 
 ## Ứng dụng
 
@@ -274,6 +239,73 @@ void loop_subset(const vector<int> &s){
     }
 }
 ```
+
+### Cài đặt cấu trúc dữ liệu Fenwick Tree
+
+Cách cài đặt [Fenwick Tree](https://vnoi.info/wiki/algo/data-structures/fenwick.md) tối ưu cũng là một trong những ứng dụng thú vị của các toán tử Bit.
+
+### Giải các bài toán bao hàm loại trừ
+
+#### Đề bài
+
+Cho một tập $S$ gồm các số nguyên tố phân biệt. Gọi $a$ là tích các số trong tập $S$. Trong các số thuộc khoảng $[0, n]$, đếm số số nguyên tố cùng nhau với $a$.
+
+#### Thuật toán
+
+Ta lặp qua mọi tập con $T$ của $S$. Gọi $b$ là tích các số trong tập $T$, và $x$ là số số trong khoảng $[0, n]$ chia hết cho $b$. Nếu $T$ có chẵn phần tử, ta cộng $x$ vào đáp án. Ngược lại, ta trừ $x$ vào đáp án.
+
+Phần chứng minh cho bài toán này bạn đọc có thể tham khảo ở bài viết về [bao hàm loại trừ](https://vnoi.info/wiki/translate/he/Number-Theory-7.md).
+
+#### Cài đặt
+
+```c++
+unsigned long long solve(const vector<unsigned long long> &a, unsigned long long n){
+    unsigned long long result = 0;
+    for (int i = 0; i < 1<<a.size(); i++){
+        unsigned long long b = 1;
+        for (int j=0; j<a.size(); j++){
+            if (i & 1<<j) b *= a[j];
+        }
+        unsigned long long x = result / b + 1;
+        if (__builtin_parity(i)) result -= x;
+        else result += x;
+    }
+    return result;
+}
+```
+
+Chú ý: Đoạn code này chỉ mang tính chất minh họa, do trên thực tế kết quả có thể tràn ```unsigned long long```. Tuy nhiên, kết quả của các thao tác tính toán tràn số trên các kiểu ```unsigned``` được xác định, nên nếu tích các số trong tập $A$ không tràn số, code này sẽ trả về kết quả theo mod $2^{64}$.
+
+## Tổng hợp một số điều cần chú ý trong C++
+
+Các thao tác bit trong C++ là một bộ công cụ rất mạnh và có hiệu suất cực đỉnh. Tất nhiên, "with great power comes great responsibility". Khi sử dụng bộ công cụ này, rất nhiều những bug thú vị đang chờ đợi bạn.
+
+### Thứ tự tính toán (Operator Precendence)
+
+Thứ tự tính toán có thể được hiểu là thứ tự mà C++ sẽ tính toán các biểu thức của bạn, ví dụ như nhân chia trước, cộng trừ sau. Trang cppreference.com có dành hẳn một [bài viết](https://en.cppreference.com/w/cpp/language/operator_precedence) để nói về thứ tự này.
+
+Một số điểm cần chú ý trong thứ tự tính toán của C++ bao gồm:
+
+- Các phép bitshift ```<<, >>``` đứng sau phép ```+, -```.
+- Phép ```&, ^, |``` đứng sau phép ```==``` và các phép ```+, -, *, /, <<, >>```.
+
+Trong mọi trường hợp, kể cả khi đã nhớ kỹ thứ tự tính toán của các toán tử, bạn vẫn nên sử dụng dấu ```()``` khi làm việc với các toán tử bit để giúp code dễ đọc hơn và hạn chế bug.
+
+### Toán tử Bitshift
+
+Trong phép Bitshift Left, nếu toán tử đầu tiên của bạn là một số âm, hoặc kết quả tính toán của bạn tràn số, thì code của bạn sẽ bị UB.
+
+Đối với tất cả mọi phép bitshift, nếu toán tử thứ hai của bạn là một số âm, hoặc có giá trị lớn hơn hoặc bằng số lượng bit có trong kiểu số của kết quả, thì code của bạn bị UB. Trong gần như hầu hết trường hợp, chỉ có $5$ hoặc $6$ bit cuối cùng (lần lượt với hai trường hợp ```int``` và ```long long```) trong toán tử thứ hai được sử dụng, nên chúng ta có thể đoán trước được code sẽ làm gì. Tuy nhiên, không nên dựa vào tính chất này để viết code.
+
+### Tràn số khi truy cập bit
+
+Một lỗi thường gặp của những bạn mới làm quen với các toán tử bit là tràn số khi thực hiện phép ```1 << pos``` để truy cập bit. Bạn đọc có thể xem phần [Truy cập bit](#truy-cập-bit) để rõ hơn.
+
+### Không sử dụng định hướng ```#pragma``` ở đầu code
+
+Nếu sử dụng các hàm trong mục [Các hàm thao tác bit](#các-hàm-thao-tác-bit), bạn nên sử dụng định hướng biên dịch ```#pragma GCC target``` như đã được mô tả trong phần [Sử dụng Pragma](#sử-dụng-pragma). Tuy nhiên, trong phần lớn trường hợp, định hướng biên dịch này cũng chỉ giúp bạn tăng tốc code thêm khoảng $20\%$.
+
+## Mở rộng
 
 ### Lặp qua mọi tập con của một bitmask
 
@@ -382,71 +414,39 @@ int main(){
 }
 ```
 
-### Cài đặt cấu trúc dữ liệu Fenwick Tree
-
-Cách cài đặt [Fenwick Tree](https://vnoi.info/wiki/algo/data-structures/fenwick.md) tối ưu cũng là một trong những ứng dụng thú vị của các toán tử Bit.
-
-### Giải các bài toán bao hàm loại trừ
-
-#### Đề bài
-
-Cho một tập $S$ gồm các số nguyên tố phân biệt. Gọi $a$ là tích các số trong tập $S$. Trong các số thuộc khoảng $[0, n]$, đếm số số nguyên tố cùng nhau với $a$.
-
-#### Thuật toán
-
-Ta lặp qua mọi tập con $T$ của $S$. Gọi $b$ là tích các số trong tập $T$, và $x$ là số số trong khoảng $[0, n]$ chia hết cho $b$. Nếu $T$ có chẵn phần tử, ta cộng $x$ vào đáp án. Ngược lại, ta trừ $x$ vào đáp án.
-
-Phần chứng minh cho bài toán này bạn đọc có thể tham khảo ở bài viết về [bao hàm loại trừ](https://vnoi.info/wiki/translate/he/Number-Theory-7.md).
-
-#### Cài đặt
-
-```c++
-unsigned long long solve(const vector<unsigned long long> &a, unsigned long long n){
-    unsigned long long result = 0;
-    for (int i = 0; i < 1<<a.size(); i++){
-        unsigned long long b = 1;
-        for (int j=0; j<a.size(); j++){
-            if (i & 1<<j) b *= a[j];
-        }
-        unsigned long long x = result / b + 1;
-        if (__builtin_parity(i)) result -= x;
-        else result += x;
-    }
-    return result;
-}
-```
-
-Chú ý: Đoạn code này chỉ mang tính chất minh họa, do trên thực tế kết quả có thể tràn ```unsigned long long```. Tuy nhiên, kết quả của các thao tác tính toán tràn số trên các kiểu ```unsigned``` được xác định, nên nếu tích các số trong tập $A$ không tràn số, code này sẽ trả về kết quả theo mod $2^{64}$.
-
 ### Tăng tốc cho code
 
 Nếu sử dụng kiểu dữ liệu ```unsigned long long```, ta có thể thực hiện 64 phép AND, OR, XOR, hoặc NOT trong một thao tác. Trên thực tế, khi dịch, một số các compiler có thể giúp bạn thực hiện $256$ hay thậm chí $512$ phép toán như vậy cùng một lúc. Như vậy, một số bài toán với giới hạn như $n \leq 5*10^4$ hay thậm chí $n \leq 10^5$ có thể chạy qua được với độ phức tạp $O(n^2)$. Tuy nhiên, do giới hạn của bài viết, chủ đề này sẽ không được bàn đến ở đây.
 
-## Tổng hợp một số điều cần chú ý trong C++
+#### Phân biệt Logical Right Shift và Arithmetic Right Shift
 
-Các thao tác bit trong C++ là một bộ công cụ rất mạnh và có hiệu suất cực đỉnh. Tất nhiên, "with great power comes great responsibility". Khi sử dụng bộ công cụ này, rất nhiều những bug thú vị đang chờ đợi bạn.
+Riêng đối với Right Shift, hầu hết các cấu trúc máy tính cung cấp hai loại phép toán khác nhau là Logical Right Shift và Arithmetic Right Shift.
 
-### Thứ tự tính toán (Operator Precendence)
+Khác biệt duy nhất giữa hai loại phép toán này là Logical Right Shift điền các bit bên trái mới được thêm bằng $0$, trong khi Arithmetic Right Shift điền các bit này là giá trị của bit trái cùng trong số ban đầu (bit thứ $31$ đối với kiểu ```int```, và bit thứ $63$ đối với kiểu ```long long```).
 
-Thứ tự tính toán có thể được hiểu là thứ tự mà C++ sẽ tính toán các biểu thức của bạn, ví dụ như nhân chia trước, cộng trừ sau. Trang cppreference.com có dành hẳn một [bài viết](https://en.cppreference.com/w/cpp/language/operator_precedence) để nói về thứ tự này.
+Chẳng hạn, ta sử dụng kiểu số ```char``` có 8 bit, và thực hiện phép toán ```0b```**```101```**```01101 >> 5```. Logical Right Shift sẽ trả về kết quả ```0b00000```**```101```**, nhưng Arithmetic Right Shift sẽ trả về ```0b11111```**```101```**.
 
-Một số điểm cần chú ý trong thứ tự tính toán của C++ bao gồm:
+Chắc chắn khi đọc đến đây, các bạn sẽ tự hỏi về ý nghĩa của phép Arithmetic Right Shift. Trong trường hợp toán hạng ```a``` là số không âm, hai phép toán hoạt động tương đương. Tuy nhiên, trong trường hợp ```a``` âm, phép Logical Right Shift không có ý nghĩa về mặt toán học, mà đơn giản chỉ là đẩy các bit sang phải. Trong khi đó, phép Arithmetic Right Shift sẽ vẫn đảm bảo tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$. Chú ý rằng kết quả của phép toán sẽ được làm tròn xuống, chẳng hạn như ```-7 >> 2``` $= \frac{-7}{2^2} = -1.75$ được làm tròn xuống $-2$.
 
-- Các phép bitshift ```<<, >>``` đứng sau phép ```+, -```.
-- Phép ```&, ^, |``` đứng sau phép ```==``` và các phép ```+, -, *, /, <<, >>```.
+Lý do phép toán trên hoạt động là vì các số nguyên âm được biểu diễn dưới dạng two's complement. Do giới hạn của bài viết, người viết sẽ không đi sâu hơn vào loại biểu diễn này.
 
-Trong mọi trường hợp, kể cả khi đã nhớ kỹ thứ tự tính toán của các toán tử, bạn vẫn nên sử dụng dấu ```()``` khi làm việc với các toán tử bit để giúp code dễ đọc hơn và hạn chế bug.
+Trong C++, phép Logical Right Shift sẽ được sử dụng nếu toán tử đầu tiên là một số thuộc loại ```unsigned```, còn nếu không thì phép Arithmetic Right Shift sẽ được sử dụng.
 
-### Toán tử Bitshift
+### Sử dụng Pragma
 
-Trong phép Bitshift Left, nếu toán tử đầu tiên của bạn là một số âm, hoặc kết quả tính toán của bạn tràn số, thì code của bạn sẽ bị UB.
+Đối với gần như tất cả ($>99\%$) những máy tính mà bạn sẽ gặp trong đời, các hàm phía trên có thể được thực hiện với chỉ $1$ instruction, hay nói cách khác là trong $O(1)$. Tuy nhiên, để hỗ trợ những máy tính rất cũ hoặc rất low-end, compiler GCC mặc định cài đặt các hàm trên bằng toán tử bit, chạy trong $O(\log_2 \log_2 n)$, với $n$ là số lượng bit trong kiểu số của bạn.
 
-Đối với tất cả mọi phép bitshift, nếu toán tử thứ hai của bạn là một số âm, hoặc có giá trị lớn hơn hoặc bằng số lượng bit có trong kiểu số của kết quả, thì code của bạn bị UB. Trong gần như hầu hết trường hợp, chỉ có $5$ hoặc $6$ bit cuối cùng (lần lượt với hai trường hợp ```int``` và ```long long```) trong toán tử thứ hai được sử dụng, nên chúng ta có thể đoán trước được code sẽ làm gì. Tuy nhiên, không nên dựa vào tính chất này để viết code.
+Để mở khóa các instruction mới, các bạn cần phải sử dụng định hướng biên dịch ```#pragma GCC target```.
 
-### Tràn số khi truy cập bit
+Hầu hết mỗi hàm đều có một "flag" riêng biệt mà khi bật lên sẽ mở khóa instruction cho hàm đó. Tuy nhiên, nếu bạn mở khóa thừa thì code bạn vẫn chạy. Vì vậy, để code chạy nhanh hơn, bạn chỉ cần paste dòng sau vào đầu code (trước dòng ```#include```):
 
-Một lỗi thường gặp của những bạn mới làm quen với các toán tử bit là tràn số khi thực hiện phép ```1 << pos``` để truy cập bit. Bạn đọc có thể xem phần [Truy cập bit](#truy-cập-bit) để rõ hơn.
+```c++
+#pragma GCC target("popcnt,lzcnt,bmi,bmi2,abm")
+```
 
-### Không sử dụng định hướng ```#pragma``` ở đầu code
+### Điều gì xảy ra nếu phép Left Shift tràn số?
 
-Nếu sử dụng các hàm trong mục [Các hàm thao tác bit](#các-hàm-thao-tác-bit), bạn nên sử dụng định hướng biên dịch ```#pragma GCC target``` như đã được mô tả trong phần [Sử dụng Pragma](#sử-dụng-pragma). Tuy nhiên, trong phần lớn trường hợp, định hướng biên dịch này cũng chỉ giúp bạn tăng tốc code thêm khoảng $20\%$.
+Với C++, nếu phép toán ```a << b``` của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng), sẽ có 2 trường hợp xảy ra:
+
+1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất. Nói cách khác, gọi số bit của kiểu số kết quả là $c$ ($c$ là $32$ với ```unsigned int```, và $64$ với ```unsigned long long```), kết quả trả về sẽ được tính theo modulo ```2^c```.
+2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó. Điều tương tự xảy ra nếu toán hạng ```a``` của bạn là một số âm.
