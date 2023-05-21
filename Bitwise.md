@@ -13,8 +13,6 @@ Trước khi đọc bài viết này, bạn cần trang bị kiến thức về 
 - Biểu diễn nhị phân của số nguyên.
 - Cách sử dụng AND (&&) và OR (||) đối với các toán hạng bool trong C++.
 
-Một số đoạn code trong bài viết chỉ đảm bảo hoạt động với compiler GCC. Các đoạn này sẽ được viết kèm theo mục Chú ý ở phía dưới.
-
 Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
 - **Bảng chân trị (Truth Table)** của một toán tử bit có thể hiểu nôm na là tất cả các trường hợp đầu vào/đầu ra của phép toán đó.
@@ -27,11 +25,13 @@ Các khái niệm sau được sử dụng xuyên suốt bài viết:
 
     Chú ý: Trong bài viết này, thứ tự các bit của bitmask được đánh số từ phải sang trái, bắt đầu từ $0$. Điều này tương tự như chữ số hàng đơn vị, hàng chục, hàng trăm, hàng nghìn trong số thập phân lần lượt được viết từ trái sang phải, từ thấp đến cao.
 
-    Trên thực tế, ta sẽ biểu diễn bitmask bằng các số nguyên (ví dụ như các kiểu ```int``` hay ```long long``` trong C++), hoặc các cấu trúc dữ liệu bit như ```bitset``` của C++.
+    Trên thực tế, ta sẽ thường biểu diễn bitmask bằng các kiểu số nguyên (ví dụ như các kiểu ```int``` hay ```long long``` trong C++).
 
 - Trong một bitmask, **bit thứ $i$ bật** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $1$. Tương tự, **bit thứ $i$ tắt** có nghĩa là bit thứ $i$ của bitmask này có giá trị bằng $0$.
 
 - **Undefined Behaviour (UB)** được dùng để chỉ một đoạn code không có hành vi cố định. Nói cách khác, ta không biết đoạn code đó sẽ làm gì. Một đoạn code UB có thể trả về kết quả sai, làm chương trình gặp lỗi, hay trả về các kết quả khác nhau với hai lần chạy khác nhau, hoặc thậm chí là với compiler khác nhau.
+
+- **Ký hiệu $L$** được dùng để chỉ số lượng Bit của kiểu số hiện tại đang sử dụng ($32$ với ```int``` và $64$ với ```long long```).
 
 ## Các toán tử thao tác bit (Bitwise Operators) cơ bản
 
@@ -112,7 +112,7 @@ Nếu quan sát kỹ, bạn sẽ nhận thấy một tính chất thú vị sau 
 
 Với C++, không nên để phép toán ```a << b``` của bạn bị tràn số (bit $1$ được left shift đến quá giới hạn của kiểu số đang sử dụng) vì sẽ có trường hợp code của bạn bị UB. Để biết cụ thể về các trường hợp này, bạn có thể tham khảo phần [Phép Left Shift tràn số](#điều-gì-xảy-ra-nếu-phép-left-shift-tràn-số).
 
-Ngoài ra, nếu giá trị của ```b``` là âm hoặc lớn hơn hoặc bằng số lượng bit mà kiểu số của kết quả hỗ trợ ($64$ đối với ```(unsigned) long long``` và $32$ đối với ```(unsigned) int```), kết quả trả về của phép toán là không xác định.
+Ngoài ra, nếu $b < 0$ hoặc $b \geq L$, kết quả trả về của phép toán là không xác định.
 
 ### Toán tử BITSHIFT RIGHT (>>)
 
@@ -120,41 +120,46 @@ Nếu như Left Shift là thêm chữ số $0$ vào bên phải của một số
 
 Ví dụ, xét số ```13 = 0b1101```, ta có ```0b1101 >> 2 = 0b11```.
 
-Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$ với $a$ nguyên không âm.
+Tương tự với Bitshift Left, ta cũng có tính chất ```a >> b``` $= \lfloor \frac{a}{2^b} \rfloor$ với $a$ nguyên không âm. Nếu $b < 0$ hoặc $b \geq L$, kết quả trả về của phép toán là không xác định. Dù trên thực tế không sử dụng nhiều, nhưng nếu bạn đọc cảm thấy tò mò về trường hợp $a < 0$ thì có thể tham khảo phần [Phân biệt LRS và ARS](#phân-biệt-logical-right-shift-và-arithmetic-right-shift).
 
 ## Các hàm thao tác Bit
 
-**Chú ý:** Tại thời điểm viết bài, hầu hết các kỳ thi chính thức chưa cho phép sử dụng chuẩn `C++20`. Nếu không chắc chắn, các bạn vui lòng chỉ sử dụng những biến thể không thuộc `C++20` của các hàm này
+Compiler GCC (là Compiler đi kèm với Codeforces, Dev-C++, và được sử dụng trên các OJ phổ biến) hiện nay hỗ trợ một số các hàm liên quan tới xử lý bit giúp ta thực hiện một số các phép tính thông dụng với độ phức tạp thời gian $O(1)$.
 
-C++ hiện nay hỗ trợ một số các hàm liên quan tới xử lý bit giúp ta thực hiện một số các phép tính thông dụng với độ phức tạp thời gian $O(1)$.
+Nếu bạn tới đây để đọc lại tên hàm, đây là bảng TL;DR:
 
-### Hàm POPCOUNT
+|Tên thao tác           |Tên hàm                            |Giá trị trả về                 |Trường hợp UB  |
+|----                   |----                               |----                           |----           |
+|Population Count       |```std::__builtin_popcountll(x)``` |Số Bit bật                     |               |
+|Parity                 |```std::__builtin_parityll(x)```   |Số Bit bật modulo $2$          |               |
+|Count Leading Zeroes   |```std::__builtin_clzll(x)```      |Số Bit $0$ ở đầu               |```x == 0```   |
+|Log2                   |```std::__lg(x)```                 |$\lfloor\log_2(x)\rfloor$      |               |
+|Count Trailing Zeroes  |```std::__builtin_ctzll(x)```      |Số Bit $0$ ở cuối              |```x == 0```   |
+|Find First Set         |```std::__builtin_ffsll(x)```      |Số thứ tự của Bit $1$ đầu tiên |               |
 
-Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::popcount(int x)```. Hàm này trả về số lượng bit bật trong bitmask $x$.
+Chú ý: Đối với các hàm có dạng ```std::__builtin```, thêm đuôi ```ll``` sẽ gọi hàm đó với kiểu đầu vào là ```unsigned long long```. Để thuận tiện, người viết sẽ bỏ qua đuôi này trong phần tiếp theo.
 
-Chẳng hạn, ta có ```std::popcount(0b100101) = 3```.
+### Hàm Population Count và Parity
 
-Đối với các chuẩn C++ cũ hơn, compiler GCC cung cấp các hàm tương tự là ```std::__builtin_popcount(x)``` (population count) cho kiểu ```unsigned int``` và ```std::__builtin_popcountll(x)``` cho kiểu ```unsigned long long```.
+GCC cung cấp hàm ```std::__builtin_popcount(x)``` (population count) trả về số lượng bit bật trong bitmask $x$. Chẳng hạn, ```std::__builtin_popcount(0b100101) = 3```.
 
-Chú ý: Đối với các hàm có dạng ```std::__builtin```, thêm đuôi ```ll``` sẽ gọi hàm đó với kiểu đầu vào là ```unsigned long long```. Vì vậy, người viết sẽ không nhắc đến các biến thể này ở các phần sau nữa.
+Ngoài ra, cũng có hàm ```std::__builtin_parity(x)``` trả về ```std::__builtin_popcount(x) % 2```. Hàm này thường được sử dụng trong các bài toán liên quan tới bao hàm loại trừ.
 
-Ngoài ra, GCC cũng cung cấp hàm ```std::__builtin_parity(x)``` trả về ```std::popcount(x) % 2```. Hàm này thường được sử dụng trong các bài toán liên quan tới bao hàm loại trừ.
+### Hàm Count Leading Zeroes và Log2
 
-### Hàm COUNTL_ZERO
+GCC cung cấp hàm ```std::__builtin_clz(x)```Trả về số lượng bit $0$ ở bên trái bit $1$ cao nhất của biến đầu vào. Chú ý, hàm này trả về kết quả không xác định đối với ```x == 0```.
 
-Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::countl_zero(x)``` trả về số lượng bit $0$ ở bên trái của biến đầu vào.
+Chẳng hạn, ```std::__builtin_clz(0b10) == 30```. Kết quả này là do kiểu ```int``` có 32 bit. Cụ thể, số ```0b10``` khi lưu dưới dạng ```int``` sẽ có thể được biểu diễn là:
 
-Chẳng hạn, ```std::countl_zero(int(0b10)) == 30``` (do kiểu ```int``` có 32 bit).
+```0b 0000 0000 0000 0000 0000 0000 0000 0010```
 
-GCC cũng có hàm ```std::__builtin_clz(x)``` (count leading zeroes). Tuy nhiên, hàm này trả về kết quả không xác định đối với ```x == 0```.
+Ngoài ra cũng có hàm ```std::__lg(x) == 31 - std::__builtin_clz(x) == 63 - std::__builtin_clzll(x)```. Hàm này trả về $\lfloor \log_2(x) \rfloor$, thường được sử dụng trong cài đặt của Bảng thưa (Sparse Table).
 
-Phép toán ```31 - std::__builtin_clz(x)``` hay ```63 - std::__builtin_clzll(x)``` trả về $\lfloor \log_2(x) \rfloor$, thường được sử dụng trong cài đặt của Bảng thưa (Sparse Table).
+### Hàm Count Trailing Zeroes và Find First Set
 
-### Hàm COUNTR_ZERO
+GCC cung cấp hàm ```std::__builtin_ctz(x)``` trả về số lượng bit $0$ ở bên phải bit $1$ thấp nhất của biến đầu vào. Chú ý, hàm này cũng trả về kết quả không xác định đối với ```x == 0```. Chẳng hạn, ```std::__builtin_ctz(0b100100) = 2```.
 
-Từ chuẩn C++20 trở lên, thư viện chuẩn của C++ cung cấp hàm ```std::countr_zero(x)``` trả về số lượng bit $0$ ở bên phải của biến đầu vào.
-
-Hàm tương đương của GCC là ```std:::__builtin_ctz(x)``` (count trailing zeroes). Tuy nhiên hàm này có giá trị không xác định với ```x == 0```. GCC cũng cung cấp một hàm khác là ```std::__builtin_ffs(x) == std::__builtin_ctz(x) + 1```. Trong trường hợp ```x == 0```, hàm này trả về $0$.
+GCC cũng cung cấp một hàm khác là ```std::__builtin_ffs(x) == std::__builtin_ctz(x) + 1```. Trong trường hợp ```x == 0```, hàm này trả về $0$.
 
 ## Ứng dụng
 
@@ -162,7 +167,7 @@ Hàm tương đương của GCC là ```std:::__builtin_ctz(x)``` (count trailing
 
 Một ứng dụng thường thấy của các phép toán bit là đọc và sửa từng bit trong một bitmask.
 
-Chẳng hạn, để truy cập bit thứ $i$ trong bitmask $A$, ta có thể sử dụng phép toán ```A & (1<<i)```. Trước khi đọc giải thích của phép toán này, hãy tự mình chạy thử một số ví dụ.
+Chẳng hạn, để truy cập bit thứ $i$ trong bitmask $A$, ta có thể sử dụng phép toán ```A & (1LL<<i)```. Trước khi đọc giải thích của phép toán này, hãy tự mình chạy thử một số ví dụ.
 
 Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép toán ```0b1010010 & (1<<4)``` như sau:
 
@@ -172,9 +177,9 @@ Xét ```A = 0b1010010```. Để truy cập bit thứ $4$, ta thực hiện phép
 = 0b0010000
 ```
 
-Xét phần thứ hai của phép toán, ```1<<i```, ta nhận thấy rằng, về bản chất, phần này thực hiện thao tác tạo ra một bitmask chỉ có bit thứ $i$ bật. Bitmask này khi được AND với bitmask ban đầu sẽ loại bỏ thông tin của tất cả mọi bit ngoại trừ bit thứ $i$.
+Xét phần thứ hai của phép toán, ```1<<i```, ta nhận thấy phần này thực hiện thao tác tạo ra một bitmask chỉ có bit thứ $i$ bật. Bitmask này khi được AND với bitmask ban đầu sẽ loại bỏ thông tin của tất cả mọi bit ngoại trừ bit thứ $i$.
 
-Ngoài ra cũng có một số các cách khác để truy cập bit, ví dụ như ```(A >> i) % 2```, hay ```(A >> i) & 1```.
+Ngoài ra cũng có một số các cách khác để truy cập bit, ví dụ như ```(A >> i) % 2``` hay ```(A >> i) & 1```.
 
 Chú ý: Một lỗi rất hay gặp phải khi sử dụng bitshift để truy cập và chỉnh sửa bit là tràn số. Chẳng hạn, xét dòng code sau đây:
 
@@ -192,7 +197,7 @@ bool get_bit(unsigned long long mask, int pos){
 }
 ```
 
-Hậu tố ```ULL``` đánh dấu cho compiler biết rằng ```1ULL``` cần được coi là một số ```unsigned long long```. Như vậy, phép ```1ULL << pos``` sẽ không còn bị tràn số. Một số các hậu tố thường dùng bao gồm: ```ULL``` cho ```unsigned long long```, ```LL``` cho ```long long```, ```L``` cho ```long```, ...
+Hậu tố ```ULL``` đánh dấu cho compiler biết rằng ```1ULL``` cần được coi là một số ```unsigned long long```. Như vậy, phép ```1ULL << pos``` sẽ không còn bị tràn số. Một số các hậu tố thường dùng bao gồm: ```ULL``` cho ```unsigned long long```, ```LL``` cho ```long long```, ```L``` cho ```long```,...
 
 ### Chỉnh sửa Bit
 
@@ -206,22 +211,32 @@ Sử dụng phương pháp tương tự như phần trên, ta có một số ph�
 
 Phép toán ```((1<<i) - 1)``` tạo ra bitmask mà trong đó chỉ các bit từ $0$ tới $i-1$ được bật lên.
 
-Như vậy, để tắt tất cả các bit từ vị trí $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Đây là cách để ta loại bỏ các bit thừa sau khi thực hiện phép bitwise NOT.
+Như vậy, để tắt tất cả các bit từ vị trí $i$ trở đi, ta có thể sử dụng ```A & ((1<<i)-1)```. Đây là cách ta loại bỏ các bit thừa sau khi thực hiện phép bitwise NOT.
 
 ### Biểu diễn tập hợp
 
-Như đã nói ở phần đầu bài viết, ứng dụng đơn giản nhất của bitmask là biểu diễn một tập con của một tập $A$ cho trước nào đó. Từ ứng dụng này, ta có một dạng bài tên là quy hoạch động trạng thái (dp bitmask).
+Ứng dụng cơ bản nhất của bitmask là biểu diễn một tập con của một tập $A$ cho trước nào đó. Từ ứng dụng này, ta có một dạng bài tên là quy hoạch động trạng thái (dp bitmask).
 
-Một số các phép toán tập hợp có thể thực hiện bằng các phép toán trên bitmask, ví dụ như:
+Từ các phần [Truy cập Bit](#truy-cập-bit), [Chỉnh sửa Bit](#chỉnh-sửa-bit) và [Tắt các Bit cao nhất](#tắt-các-bit-cao-nhất-của-một-bitmask), ta có một số phép toán cơ bản trên tập hợp như sau:
 
-1. Lấy giao của tập $A$ và tập $B$ với ```A & B```.
+|Hàm                        |Ký hiệu toán    |Code                |
+|---                        |---             |---                 |
+|Giao                       |$A\cap B$       |```A & B```         |
+|Hợp                        |$A\cup B$       |```A \| B```        |
+|Hiệu                       |$A\backslash B$ |```(A ^ B) & A```   |
+|Hiệu đối xứng              |$A\Delta B$     |```A ^ B```         |
+|Phần bù                    |$A^C$ hay $A'$  |```~A & (1<<n)-1``` |
+|Kiểm tra tập con           |$A \subseteq B$ |```A & B == A```    |
+|Tập hợp chỉ có phần tử $i$ |$\{i\}$         |```1 << i```        |
+
+<!-- 1. Lấy giao của tập $A$ và tập $B$ với ```A & B```.
 2. Lấy hợp của của tập $A$ và $B$ với ```A | B```.
 3. Lấy hiệu đối xứng của tập $A$ và $B$ với ```A ^ B```.
 4. Lấy phần bù của tập $A$ với ```~A```.
 5. Kiểm tra $A$ là tập con của $B$ bằng ```A & B == A```.
 6. Tạo tập hợp $A$ chỉ có phần tử thứ $i$ bằng ```1 << i```.
 7. Hiệu của hai tập hợp $A$ và $B$ bằng ```(A ^ B) & A```.
-8. Phần bù của tập hợp $B$ trong $A$ bằng ```A & ~B```.
+8. Phần bù của tập hợp $B$ trong $A$ bằng ```A & ~B```. -->
 
 ### Lặp qua mọi tập con của tập cho trước
 
@@ -300,10 +315,6 @@ Trong phép Bitshift Left, nếu toán tử đầu tiên của bạn là một s
 ### Tràn số khi truy cập bit
 
 Một lỗi thường gặp của những bạn mới làm quen với các toán tử bit là tràn số khi thực hiện phép ```1 << pos``` để truy cập bit. Bạn đọc có thể xem phần [Truy cập bit](#truy-cập-bit) để rõ hơn.
-
-### Không sử dụng định hướng ```#pragma``` ở đầu code
-
-Nếu sử dụng các hàm trong mục [Các hàm thao tác bit](#các-hàm-thao-tác-bit), bạn nên sử dụng định hướng biên dịch ```#pragma GCC target``` như đã được mô tả trong phần [Sử dụng Pragma](#sử-dụng-pragma). Tuy nhiên, trong phần lớn trường hợp, định hướng biên dịch này cũng chỉ giúp bạn tăng tốc code thêm khoảng $20\%$.
 
 ## Mở rộng
 
@@ -450,3 +461,9 @@ Với C++, nếu phép toán ```a << b``` của bạn bị tràn số (bit $1$ �
 
 1. Nếu kiểu số của kết quả là một số ```unsigned```, các bit bị tràn sẽ được coi như là $0$, và biến mất. Nói cách khác, gọi số bit của kiểu số kết quả là $c$ ($c$ là $32$ với ```unsigned int```, và $64$ với ```unsigned long long```), kết quả trả về sẽ được tính theo modulo ```2^c```.
 2. Nếu kiểu số của kết quả là một số ```signed```, chương trình của bạn sẽ bị UB. Tuy nhiên, trong hầu hết trường hợp, code của bạn sẽ không bị lỗi, mà chỉ trả về một kết quả không xác định nào đó. Điều tương tự xảy ra nếu toán hạng ```a``` của bạn là một số âm.
+
+### Thư viện `<bit>` của `C++20`
+
+**Chú ý:** Tại thời điểm viết bài, hầu hết các kỳ thi chính thức chưa cho phép sử dụng chuẩn `C++20`. Nếu không chắc chắn, các bạn vui lòng chỉ sử dụng những biến thể không thuộc `C++20` của các hàm này.
+
+Một trong những điểm mới của phiên bản `C++20` là thư viện `<bit>`. Thư viện này chứa các hàm tương tự như [Các hàm thao tác Bit](#các-hàm-thao-tác-bit). Điểm lợi của các hàm trong thư viện `<bit>` là có khả năng chạy trên tất cả các Compiler C++ khác nhau, nhưng điểm trừ là chỉ chạy được với chuẩn `C++20` trở lên.
