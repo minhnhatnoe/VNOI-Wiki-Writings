@@ -156,7 +156,15 @@ Rõ ràng, `g[v].go[i] = g[v].nxt[i]` nếu `g[v].nxt[i] != -1`. Đối với tr
 
 ## Xây dựng liên kết thoát
 
-Nếu tập $S$ của bài toán cho các xâu với giới hạn về tổng số chữ cái, 
+Với mỗi tiền tố $X = T_{0..i}$ tương ứng với con trỏ $p$, nếu nhảy theo liên kết hậu tố, ta có thể tìm thấy được tất cả xâu $Y$ thuộc $S$ trùng với hậu tố của xâu $X$. Nói cách khác, với mỗi $0 \leq i <|T|$, ta tìm được một $j$ sao cho $T_{j..i}$ thuộc $S$. Tuy nhiên, việc tìm kiếm này là $O(n)$.
+
+Với giới hạn đầu vào $10^5$, ta có thể tìm được tất cả các $j$ hay không? Quan trọng hơn, số lượng $j$ thoả mãn điều kiện này là bao nhiêu? Sau đây, ta sẽ chứng minh số lượng vị trí $j$ thoả mãn với mỗi vị trí $i$ là $O(\sqrt{\sum{|S_k|}})$ ($\sum{|S_k|}$ là tổng số chữ cái trong các xâu thuộc $S$).
+
+Gọi $Y$ là tập các xâu thuộc $S$ mà tồn tại $j$ sao cho $Y = T_{j..i}$. Do các vị trí $j$ khác nhau, độ dài các xâu thuộc $Y$ khác nhau. Rõ ràng, $\sum{|Y_i|} \geq \frac{|Y| * |Y+1|}{2}$ (xâu ngắn nhất trong $Y$ có độ dài $\geq 1$, xâu ngắn thứ hai có độ dài $\geq 2$, ...). Như vậy, $|Y| = O(\sqrt{\sum{|S_i|}})$. Chứng minh hoàn tất.
+
+Nói một cách nôm na, với mỗi tiền tố $X$ của $T$ (có $|T|$ $X$ như vậy), có $O(\sqrt{\sum{|S_i|}})$ hậu tố của $X$ trùng với một xâu thuộc $S$. Chú ý rằng, tất cả các hậu tố của các tiền tố chính là tất cả các xâu con liên tiếp. Như vậy, có $O(|T| * \sqrt{\sum{|S_i|}})$ lần xuất hiện của các xâu thuộc $S$ trong xâu $T$.
+
+Do số lượng lần nhảy theo liên kết hậu tố từ một vị trí là $O(n)$, để có thể tìm kiếm nhanh chóng tất cả các hậu tố như vậy, ta lưu thêm "liên kết thoát" (exit link) trên mỗi nút. Liên kết thoát của `p` sẽ trỏ tới nút `q` sao cho khi nhảy theo liên kết hậu tố từ `p`, `q` sẽ là nút đầu tiên mà `cnt != 0` (đồng nghĩa với việc tồn tại xâu được biểu diễn bởi nút `q` trong $S$).
 
 ## Cài đặt hoàn chỉnh
 
@@ -198,13 +206,13 @@ struct aho_corasick{
 };
 ```
 
-## Xử lý các query online
+## Xử lý query thay đổi tập xâu
 
 Dễ thấy rằng thuật toán xây dựng của chúng ta là một thuật toán offline (tập xâu $S$ không được thay đổi). Trên thực tế, có một số bài toán đòi hỏi thêm bớt các xâu qua từng truy vấn. Đối với những bài toán này, ta có các cách giải quyết như sau:
 
 ### Xử lý Offline
 
-Nếu bài toán cho các truy vấn từ đầu, ta có thể nhập tất cả các truy vấn, sau đó xây dựng cây Aho-Corasick trên các truy vấn này. Ta xây dựng cây thứ hai với các cạnh là các liên kết hậu tố, sau đó quản lý các nút qua từng truy vấn bằng cách sử dụng Cây phân đoạn và [Đường đi Euler trên cây](https://vnoi.info/wiki/algo/graph-theory/euler-tour-on-tree.md). Do giới hạn của bài viết này, người viết sẽ không đi sâu hơn vào các kỹ thuật trên.
+Nếu bài toán cho các truy vấn từ đầu, ta có thể nhập tất cả các truy vấn, sau đó xây dựng cây Aho-Corasick trên các truy vấn này. Ta xây dựng cây thứ hai với các cạnh là các liên kết hậu tố, sau đó quản lý các nút qua từng truy vấn bằng cách sử dụng Cây phân đoạn và [Đường đi Euler trên cây](https://vnoi.info/wiki/algo/graph-theory/euler-tour-on-tree.md). Do giới hạn của bài viết này, người viết sẽ không đi sâu hơn.
 
 ### Xử lý Online
 
