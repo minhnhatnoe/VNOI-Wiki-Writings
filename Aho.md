@@ -4,39 +4,40 @@ Người viết: Nguyễn Minh Nhật - HUS High School for Gifted Students
 
 Reviewer:
 
-# Giới thiệu
+## Giới thiệu
 
 Trước khi đọc bài viết này, bạn cần trang bị kiến thức về các chủ đề sau:
 
-- [Trie (Cây tiền tố)](https://vnoi.info/wiki/algo/data-structures/Trie.md) - Cấu trúc dữ liệu giúp quản lý một tập hợp các xâu.
+- [Trie (Cây tiền tố)](https://vnoi.info/wiki/algo/data-structures/trie.md) - Cấu trúc dữ liệu giúp quản lý một tập hợp các xâu.
 - [Thuật toán Knuth-Morris-Pratt (KMP)](https://vnoi.info/wiki/algo/string/kmp.md) - Thuật toán giúp tìm các lần xuất hiện của một xâu trong xâu khác. Dù cũng không quá cần thiết, kiến thức về KMP Automaton sẽ giúp bạn hiểu rõ bài này hơn.
 
 Nếu như đã học qua Trie và thuật toán KMP, đã bao giờ bạn nghĩ tới việc kết hợp chúng chưa? Điều gì sẽ xảy ra nếu ta có thể chạy KMP trên nhiều xâu cùng một lúc?
 
 Aho-Corasick là một thuật toán giúp bạn quản lý một tập xâu và trả lời bài toán:
 
-**Cho một tập xâu $S$ và các xâu $T_i$. Với mỗi xâu $T_i$, liệt kê tất cả các lần xuất hiện của các xâu trong tập $S$.**
+**Cho $N$ xâu $S_i$ và $Q$ xâu $T_i$. Với mỗi xâu $T_i$, liệt kê tất cả các lần xuất hiện của các xâu $S_i$ ở trong xâu $T_i$ này.**
 
 Độ phức tạp của Aho-Corasick là:
 
-- Xây dựng trong $O(c*\sum{|S_i|})$ với $c$ là số lượng chữ cái khác nhau trong xâu và $|S_i|$ là số chữ cái trong xâu $S_i$. Giả sử bài toán cho các xâu chữ cái la-tinh viết thường, độ phức tạp là $26 * \sum{|S_i|}$.
+- Xây dựng trong $O(c*\sum{|S_i|})$ với $c$ là số lượng chữ cái khác nhau trong $N$ xâu $S_i$ và $|S_i|$ là số chữ cái trong xâu $S_i$. Giả sử bài toán cho các xâu chữ cái la-tinh viết thường, độ phức tạp là $26 * \sum{|S_i|}$.
 - Truy vấn trong $O(|T|)$, với $|T|$ là độ dài xâu truy vấn.
 
 ## Ký hiệu
 
 Trong bài viết này, ta quy ước các ký hiệu như sau:
+
 - Nếu không có giải thích gì thêm, $c$ là độ lớn của bảng chữ cái (thường là $26$ - số chữ cái từ `A-Z`).
 - Với $S$ là một xâu, $|S|$ là độ dài của xâu $S$.
-- Với $S$ là một xâu, $S_i$ $(0 \leq i < |S|)$ là chữ cái thứ $i$ trong xâu $S$. Ta quy ước $S_i$ chạy từ $0$ tới $c-1$.
+- Với $S$ là một xâu, $S_i$ $(0 \leq i < |S|)$ là chữ cái thứ $i$ trong xâu $S$. Ta quy ước $S_i \in [0, c-1)$
 - Với $S$ là một xâu, $S_{l..r}$ $(0 \leq l \leq r < |S|)$ là xâu con liên tiếp từ $l$ tới $r$ của xâu S.
 
 Ngoài ra, trong bài viết này, ta tạm gọi cấu trúc dữ liệu được xây dựng bởi thuật toán Aho-Corasick là cây Aho-Corasick.
 
 ## Xây dựng Trie
 
-Cách xây dựng Trie, các bạn có thể tham khảo ở bài viết về [Trie (Cây tiền tố)](https://vnoi.info/wiki/algo/data-structures/Trie.md). Để xây dựng cây Aho-Corasick, ta xây dựng Trie đối với tập xâu $S$. Cài đặt của bước này như sau:
+Cách xây dựng Trie, các bạn có thể tham khảo ở bài viết về [Trie (Cây tiền tố)](https://vnoi.info/wiki/algo/data-structures/trie.md). Để xây dựng cây Aho-Corasick, ta xây dựng Trie đối với tập xâu $S$. Cài đặt của bước này như sau:
 
-```c++
+```c++=
 struct trie{
     struct node{
         int cnt, nxt[26];
@@ -59,7 +60,7 @@ struct trie{
 
 Ở mỗi nút của Trie, ta lưu một biến `cnt` là số lượng xâu trong tập $S$ kết thúc ở nút này. Tùy vào câu hỏi cụ thể của bài toán, biến này có thể lưu các giá trị khác.
 
-Chú ý: theo tính chất của cấu trúc dữ liệu Trie, mỗi nút trong cây sẽ đại diện cho một **tiền tố của một xâu $S_i$** nào đó. Tính chất này đến phần sau sẽ quan trọng.
+**Chú ý:** theo tính chất của cấu trúc dữ liệu Trie, mỗi nút trong cây sẽ đại diện cho một **tiền tố của một xâu $S_i$** nào đó. Tính chất này sẽ cần sử dụng trong các phần sau.
 
 ## Phân tích thuật toán Knuth-Morris-Pratt
 
@@ -88,22 +89,38 @@ void print_matches(const string &s, const string &t){
 Hàm `print_matches(s, t)` ở trên in ra tất cả các lần xuất hiện của xâu $S$ trong xâu $T$. Hàm này thực hiện
 
 - Xây dựng hàm tiền tố `pi` cho xâu $S$.
-- Khởi tạo con trỏ `p`` trên xâu $S$, ban đầu trỏ về vị trí $0$.
+- Khởi tạo con trỏ `p` trên xâu $S$, ban đầu trỏ về vị trí $0$.
 - Duyệt lần lượt qua từng chữ cái của xâu $T$. Con trỏ `p` nhảy theo hàm `pi` cho tới khi tìm được vị trí mà $S_p = T_i$. Sau mỗi bước duyệt, con trỏ chỉ tới **tiền tố dài nhất của $S$** mà trùng với một **hậu tố của $T_{0..i}$**.
 
 ## Xây dựng cây Aho-Corasick
 
-Hãy quay lại với cài đặt Trie ở phía trên. Tương tự với Knuth-Morris-Pratt, ta sẽ xây dựng "hàm tiền tố" cho mỗi nút của Trie. Chú ý rằng mỗi nút trong cây sẽ đại diện cho một **tiền tố của một xâu $S_i$** nào đó. Trong Aho-Corasick, ta gọi "hàm tiền tố" là "liên kết hậu tố (suffix link)", do với nút $V$ theo "hàm tiền tố" của nút $P$, $V$ sẽ biểu diễn cho **hậu tố dài nhất** (khác $P$) của $P$.
+Hãy quay lại với cài đặt Trie ở phía trên. Ta sẽ xây dựng một cấu trúc tương đương "hàm tiền tố" của KMP cho Trie.
 
-Giả sử đã xây dựng được liên kết hậu tố (mỗi nút trong Trie trỏ tới một nút khác). Tương tự với Knuth-Morris-Pratt, ta khởi tạo một con trỏ chỉ tới gốc của Trie và duyệt các chữ cái trong xâu $T$.
+Cụ thể, với mỗi nút $P$ không phải nút gốc, ta xây dựng "liên kết hậu tố (suffix link)" trỏ tới một nút $V$ có tính chất: xâu được biểu diễn bởi $V$ là **hậu tố dài nhất** (khác $P$) của $P$.
 
-Sau mỗi bước duyệt, con trỏ chỉ tới nút Trie sâu nhất (hay biểu diễn cho xâu dài nhất) mà trùng với một **hậu tố của $T_{0..i}$**. Do việc trỏ tới một nút trong Trie chính là trỏ tới **tiền tố của một (vài) xâu $S_i$ nào đó**, ta có thể hình dung việc này như thực hiện Knuth-Morris-Pratt đồng thời trên tất cả các xâu trong tập $S$.
+### Giải bài toán ban đầu
+
+Trước khi đi vào cách xây dựng liên kết hậu tố, ta sẽ giải một bài toán tương đương với bài toán ban đầu. Bài toán như sau:
+
+Cho tập $N$ xâu $S$ và xâu $T$. Liệt kê tất cả các lần xuất hiện của các xâu thuộc $S$ trong xâu $T$.
+
+Giả sử đã xây dựng được liên kết hậu tố cho tất cả các nút trong Trie. Tương tự với Knuth-Morris-Pratt, ta khởi tạo một con trỏ `p` chỉ tới gốc của Trie và duyệt từng chữ cái trong xâu $T$.
+
+Sau mỗi bước duyệt qua từng chữ cái của xâu $T$, ta duy trì tính chất: Con trỏ `p` chỉ tới nút Trie sâu nhất (hay biểu diễn cho xâu dài nhất) mà trùng với một **hậu tố của $T_{0..i}$**.
+
+Do việc trỏ tới một nút trong Trie chính là trỏ tới **tiền tố của một (vài) xâu $S_i$ nào đó**, ta có thể hình dung việc này như thực hiện Knuth-Morris-Pratt đồng thời trên tất cả các xâu trong tập $S$.
 
 Để duy trì được tính chất này, con trỏ `p` sẽ nhảy theo liên kết hậu tố tới khi tìm được vị trí `p` mà **có cạnh đi tiếp với nhãn $T_i$**. Phép kiểm tra này tương đương với việc kiểm tra $S_p = T_i$ của Knuth-Morris-Pratt trên tất cả các xâu cùng lúc (và dừng lại nếu có một xâu thoả mãn).
 
+Để hiểu rõ hơn về các bước chạy của thuật toán này, chúng ta sẽ chạy thuật toán với `T = "diduduadi"` và `S = {"di", "du", "didu", "dudua", "duadi", "didi"}`.
+
 <!-- Thêm ví dụ -->
 
-Chú ý: Để tìm được tất cả các xâu trùng với một hậu tố của $T_{0..i}$ tương ứng với con trỏ `p`, ta cần phải tìm trên tất cả các nút tới được bằng cách nhảy một (vài) bước từ `p` theo liên kết hậu tố.
+**Chú ý:** Để tìm được tất cả các xâu trùng với một hậu tố của $T_{0..i}$ tương ứng với con trỏ `p`, ta cần phải tìm trên tất cả các nút tới được bằng cách nhảy một (vài) bước từ `p` theo liên kết hậu tố.
+
+### Xây dựng Automaton
+
+Nhìn lại quy trình giải bài toán trên, ta nhận thấy Việc 
 
 ### Xây dựng liên kết hậu tố và cài đặt
 
@@ -144,7 +161,7 @@ struct aho_corasick{
 };
 ```
 
-Tương tự như hàm tiền tố của Knuth-Morris-Pratt, liên kết hậu tố `slink` của một nút $P$ sẽ biểu diễn cho **hậu tố dài nhất** (khác $P$) của $P$. Rõ ràng, `slink` của một nút sẽ là một nút có độ sâu (là độ dài của xâu được biểu diễn) ngắn hơn. Như vậy, để xây dựng cây, ta có thể sử dụng thuật toán duyệt theo chiều sâu BFS.
+Tương tự như hàm tiền tố của Knuth-Morris-Pratt, liên kết hậu tố `slink` của một nút $P$ sẽ biểu diễn cho **hậu tố dài nhất** (khác $P$) của $P$. Rõ ràng, `slink` của một nút sẽ là một nút có độ sâu nhỏ hơn (hay độ dài của xâu được biểu diễn ngắn hơn). Như vậy, để xây dựng cây, ta có thể sử dụng thuật toán duyệt theo chiều sâu BFS.
 
 Đối với nút gốc, ta đặt `slink := -1` do liên kết hậu tố của nút gốc không được định nghĩa.
 
@@ -206,6 +223,8 @@ struct aho_corasick{
 };
 ```
 
+## 
+
 ## Xử lý query thay đổi tập xâu
 
 Dễ thấy rằng thuật toán xây dựng của chúng ta là một thuật toán offline (tập xâu $S$ không được thay đổi). Trên thực tế, có một số bài toán đòi hỏi thêm bớt các xâu qua từng truy vấn. Đối với những bài toán này, ta có các cách giải quyết như sau:
@@ -218,7 +237,7 @@ Nếu bài toán cho các truy vấn từ đầu, ta có thể nhập tất cả
 
 Trong một số trường hợp, bài toán yêu cầu tạo ra xâu sử dụng kết quả từ truy vấn trước (ta không thể nhập tất cả các truy vấn sau trước khi đưa ra kết quả cho truy vấn trước). Trong trường hợp này, người viết biết tới hai cách xử lý.
 
-#### Có tăng độ phức tạp thêm $O(\lg Q)$
+#### Tăng độ phức tạp thêm $O(\lg Q)$
 
 Người viết xin phép chỉ trình bày cách xử lý truy vấn thêm xâu; truy vấn xoá xâu là bài tập dành cho bạn đọc.
 
