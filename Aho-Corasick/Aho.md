@@ -759,7 +759,7 @@ Cách xây dựng giữ nguyên độ phức tạp được mô tả trong paper
 
 1. [Codeforces 1202E: You Are Given Some Strings...](https://codeforces.com/problemset/problem/1202/E)
     - Gợi ý 1: ||Với mỗi vị trí $x$ trong $T$, đếm số $i, j$ sao cho $x$ là vị trí cuối cùng của $S_i$ và $x+1$ là vị trí đầu tiên của $S_2$.||
-    - Gợi ý 2: ||Tính mảng $A$ với $A_i$ là số lượng lần xuất hiện **bắt đầu** tại $i$, $B$ với $B_i$ là số lượng lần xuất hiện **kết thúc** tại $i$
+    - Gợi ý 2: ||Tính mảng $A$ với $A_i$ là số lượng lần xuất hiện **bắt đầu** tại $i$, $B$ với $B_i$ là số lượng lần xuất hiện **kết thúc** tại $i$.||
 2. [HackerRank two-two: Two Two](https://www.hackerrank.com/contests/w4/challenges/two-two)
     - Gợi ý 1: ||Sinh ra tất cả các xâu là biểu diễn thập phân của $2^x$ với $x$ nào đó và có chiều dài $\leq |A|$.||
 3. [Codeforces 696D: Legen...](https://codeforces.com/problemset/problem/696/D)
