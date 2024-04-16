@@ -116,7 +116,7 @@ Giả sử đã xây dựng được liên kết hậu tố cho tất cả các 
 
 Để hiểu rõ hơn về các bước chạy của thuật toán này, ta chạy thuật toán với `T = "diduduadi"` và `S = {"di", "du", "didu", "dudua", "duadi", "didi"}`.
 
-<!-- Thêm ví dụ -->
+![Ví dụ](https://github.com/minhnhatnoe/VNOI-Wiki-Writings/blob/main/Aho-Corasick/AhoCorasickAnimate.mp4)
 
 **Chú ý:** Để tìm được tất cả các xâu thuộc $S$ trùng với một hậu tố của $T_{0..i}$ tương ứng với con trỏ `p`, ta cần phải tìm trên tất cả các nút tới được bằng cách nhảy một (vài) bước từ `p` theo liên kết hậu tố.
 
